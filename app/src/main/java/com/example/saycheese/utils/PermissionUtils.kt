@@ -18,4 +18,11 @@ object PermissionUtils {
             android.Manifest.permission.CAMERA
         ) == PackageManager.PERMISSION_GRANTED
     }
+
+    fun hasAudioPermission(context: Context): Boolean {
+        return ContextCompat.checkSelfPermission(
+            context,
+            android.Manifest.permission.RECORD_AUDIO
+        ) == PackageManager.PERMISSION_GRANTED
+    }
 }
