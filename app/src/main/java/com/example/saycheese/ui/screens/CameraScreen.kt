@@ -157,12 +157,19 @@ fun CameraScreen() {
                 onTakePhoto = { takePicture() },
                 onTakePhotoWithTimer = { startTimerPhoto() },
                 onSwitchCamera = {
-                    lensFacing = if (lensFacing == CameraSelector.LENS_FACING_BACK)
-                        CameraSelector.LENS_FACING_FRONT
-                    else
-                        CameraSelector.LENS_FACING_BACK
-                    settingsManager.saveCameraSettings(lensFacing, flashEnabled, gridEnabled, timerSeconds)
-                    Log.d("CameraX", "Switch camera clicked, new lens: $lensFacing")
+                    if (!timerActive) {
+                        lensFacing = if (lensFacing == CameraSelector.LENS_FACING_BACK)
+                            CameraSelector.LENS_FACING_FRONT
+                        else
+                            CameraSelector.LENS_FACING_BACK
+                        settingsManager.saveCameraSettings(
+                            lensFacing,
+                            flashEnabled,
+                            gridEnabled,
+                            timerSeconds
+                        )
+                        Log.d("CameraX", "Switch camera clicked, new lens: $lensFacing")
+                    }
                 }
             )
         }
