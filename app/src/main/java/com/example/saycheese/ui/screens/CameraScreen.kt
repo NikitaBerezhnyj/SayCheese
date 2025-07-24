@@ -11,9 +11,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.example.saycheese.data.CameraSettingsManager
 import com.example.saycheese.ui.components.*
 import com.example.saycheese.utils.PermissionUtils
+import com.example.saycheese.utils.SpeechRecognitionManager
 import com.example.saycheese.utils.takePhoto
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -21,8 +25,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun CameraScreen() {
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
     val coroutineScope = rememberCoroutineScope()
     val settingsManager = remember { CameraSettingsManager(context) }
+
     val (savedLensFacing, savedFlashEnabled, savedGridEnabled, savedTimeSecond) = settingsManager.loadCameraSettings()
 
     var lensFacing by remember { mutableStateOf(savedLensFacing) }
@@ -36,25 +42,11 @@ fun CameraScreen() {
     var timerActive by remember { mutableStateOf(false) }
 
     val hasPermissions = remember(context) {
-        PermissionUtils.hasCameraPermission(context)
-    }
-
-    if (!hasPermissions) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "Потрібен дозвіл на камеру",
-                color = Color.White
-            )
-        }
-        return
+        PermissionUtils.hasCameraPermission(context) && PermissionUtils.hasAudioPermission(context)
     }
 
     fun takePicture() {
         Log.d("CameraX", "Taking picture now")
-
         val capture = imageCapture.value
         if (capture == null) {
             Log.e("CameraX", "ImageCapture is null, camera might not be ready")
@@ -72,7 +64,6 @@ fun CameraScreen() {
             }
             return
         }
-
         takePhoto(
             context = context,
             imageCapture = capture,
@@ -98,6 +89,66 @@ fun CameraScreen() {
             delay(100)
             takePicture()
         }
+    }
+
+    val speechRecognitionManager = remember {
+        SpeechRecognitionManager(
+            context = context,
+            onCheeseDetected = {
+                Log.d("SpeechRecognition", "Cheese command detected - taking photo")
+                if (!timerActive) {
+                    takePicture()
+                }
+            },
+            onTimerDetected = {
+                Log.d("SpeechRecognition", "Timer command detected - starting timer photo")
+                if (!timerActive) {
+                    startTimerPhoto()
+                }
+            }
+        )
+    }
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> {
+                    if (hasPermissions) {
+                        speechRecognitionManager.startListening()
+                        Log.d("SpeechRecognition", "Started speech recognition")
+                    }
+                }
+                Lifecycle.Event.ON_PAUSE -> {
+                    speechRecognitionManager.stopListening()
+                    Log.d("SpeechRecognition", "Stopped speech recognition")
+                }
+                Lifecycle.Event.ON_DESTROY -> {
+                    speechRecognitionManager.destroy()
+                    Log.d("SpeechRecognition", "Destroyed speech recognition")
+                }
+                else -> {}
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+            speechRecognitionManager.destroy()
+        }
+    }
+
+    if (!hasPermissions) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Потрібен дозвіл на камеру та мікрофон",
+                color = Color.White
+            )
+        }
+        return
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
