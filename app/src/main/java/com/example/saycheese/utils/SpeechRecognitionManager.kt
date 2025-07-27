@@ -1,159 +1,294 @@
 package com.example.saycheese.utils
 
 import android.content.Context
-import android.content.Intent
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.speech.RecognitionListener
-import android.speech.RecognizerIntent
-import android.speech.SpeechRecognizer
+import android.media.AudioFormat
+import android.media.AudioRecord
+import android.media.MediaRecorder
 import android.util.Log
-import android.widget.Toast
+import kotlinx.coroutines.*
+import org.json.JSONObject
+import org.vosk.LibVosk
+import org.vosk.LogLevel
+import org.vosk.Model
+import org.vosk.Recognizer
+import java.io.*
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.core.content.ContextCompat
 
-class SpeechRecognitionManager(
+class VoskSpeechRecognizer(
     private val context: Context,
-    private val onCheeseDetected: () -> Unit,
-    private val onTimerDetected: () -> Unit
+    private val onResult: (String) -> Unit,
+    private val onPartialResult: (String) -> Unit = {},
+    private val onError: (String) -> Unit = {}
 ) {
 
-    private var speechRecognizer: SpeechRecognizer? = null
-    private var isListening = false
-    private val TAG = "SpeechRecognizer"
-
-    private val recognitionListener = object : RecognitionListener {
-        override fun onReadyForSpeech(params: Bundle?) {
-            Log.d(TAG, "onReadyForSpeech")
-        }
-
-        override fun onBeginningOfSpeech() {
-            Log.d(TAG, "onBeginningOfSpeech")
-        }
-
-        override fun onRmsChanged(rmsdB: Float) {
-            // Можна логувати рівень шуму, але не обов'язково
-        }
-
-        override fun onBufferReceived(buffer: ByteArray?) {
-            Log.d(TAG, "onBufferReceived")
-        }
-
-        override fun onEndOfSpeech() {
-            Log.d(TAG, "onEndOfSpeech")
-            if (isListening) {
-                Handler(Looper.getMainLooper()).postDelayed({ startListening() }, 500)
-            }
-        }
-
-        override fun onError(error: Int) {
-            val errorMessage = when (error) {
-                SpeechRecognizer.ERROR_AUDIO -> "Помилка аудіо"
-                SpeechRecognizer.ERROR_CLIENT -> "Помилка клієнта (можливо, не вистачає дозволів або API)"
-                SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> "Недостатньо дозволів"
-                SpeechRecognizer.ERROR_NETWORK -> "Помилка мережі (для офлайн не повинна виникати)"
-                SpeechRecognizer.ERROR_NETWORK_TIMEOUT -> "Таймаут мережі"
-                SpeechRecognizer.ERROR_NO_MATCH -> "Немає збігів розпізнавання"
-                SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> "Розпізнавач зайнятий"
-                SpeechRecognizer.ERROR_SERVER -> "Помилка сервера"
-                SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "Таймаут мови (користувач не говорить)"
-                else -> "Невідома помилка"
-            }
-            Log.e(TAG, "onError: $errorMessage ($error)")
-
-            if (isListening) {
-                speechRecognizer?.cancel()
-
-                Handler(Looper.getMainLooper()).postDelayed({ startListening() }, 1000)
-            }
-        }
-
-        override fun onResults(results: Bundle?) {
-            val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-            if (!matches.isNullOrEmpty()) {
-                val recognizedText = matches[0].lowercase()
-                Log.d(TAG, "onResults: Recognized text: '$recognizedText'")
-                if (recognizedText.contains("cheese")) {
-                    onCheeseDetected()
-                    Toast.makeText(context, "Слово 'Cheese' розпізнано!", Toast.LENGTH_SHORT).show()
-                }
-
-                if (recognizedText.contains("timer")) {
-                    onTimerDetected()
-                    Toast.makeText(context, "Слово 'Timer' розпізнано!", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            if (isListening) {
-                Handler(Looper.getMainLooper()).postDelayed({ startListening() }, 500)
-            }
-        }
-
-        override fun onPartialResults(partialResults: Bundle?) {
-            val matches = partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-            if (!matches.isNullOrEmpty()) {
-                val partialText = matches[0]
-                Log.d(TAG, "onPartialResults: $partialText")
-            }
-        }
-
-        override fun onEvent(eventType: Int, params: Bundle?) {
-            Log.d(TAG, "onEvent: $eventType")
-        }
+    companion object {
+        private const val TAG = "VoskSpeechRecognizer"
+        private const val SAMPLE_RATE = 16000
+        private const val MODEL_NAME = "vosk-model-small-en-us-0.15"
     }
+
+    private var model: Model? = null
+    private var recognizer: Recognizer? = null
+    private var audioRecord: AudioRecord? = null
+    private var isRecording = false
+    private var recognitionJob: Job? = null
 
     init {
-        if (!SpeechRecognizer.isRecognitionAvailable(context)) {
-            Toast.makeText(context, "Розпізнавання мови не доступне на цьому пристрої.", Toast.LENGTH_LONG).show()
-            Log.e(TAG, "Speech recognition not available on this device.")
-        } else {
-            createSpeechRecognizer()
+        LibVosk.setLogLevel(LogLevel.INFO)
+    }
+
+    suspend fun initializeModel(): Boolean = withContext(Dispatchers.IO) {
+        try {
+            val modelPath = copyModelToInternalStorage()
+            if (modelPath == null) {
+                onError("Не вдалося скопіювати модель")
+                return@withContext false
+            }
+
+            model = Model(modelPath)
+            recognizer = Recognizer(model, SAMPLE_RATE.toFloat())
+
+            Log.d(TAG, "Модель успішно ініціалізована")
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "Помилка ініціалізації моделі", e)
+            onError("Помилка ініціалізації: ${e.message}")
+            false
         }
     }
 
-    private fun createSpeechRecognizer() {
-        if (speechRecognizer == null) {
-            speechRecognizer = SpeechRecognizer.createSpeechRecognizer(context)
-            speechRecognizer?.setRecognitionListener(recognitionListener)
+    private fun copyModelToInternalStorage(): String? {
+        return try {
+            val modelDir = File(context.filesDir, MODEL_NAME)
+
+            if (modelDir.exists()) {
+                return modelDir.absolutePath
+            }
+
+            modelDir.mkdirs()
+
+            val assetManager = context.assets
+            val modelAssetPath = "models/$MODEL_NAME"
+
+            copyAssetFolder(assetManager, modelAssetPath, modelDir.absolutePath)
+
+            modelDir.absolutePath
+        } catch (e: Exception) {
+            Log.e(TAG, "Помилка копіювання моделі", e)
+            null
         }
     }
 
-    fun startListening() {
-        if (!SpeechRecognizer.isRecognitionAvailable(context)) {
-            Log.e(TAG, "Speech recognition not available.")
+    private fun copyAssetFolder(assetManager: android.content.res.AssetManager, fromAssetPath: String, toPath: String) {
+        try {
+            val files = assetManager.list(fromAssetPath) ?: return
+
+            if (files.isEmpty()) {
+                copyAssetFile(assetManager, fromAssetPath, toPath)
+            } else {
+                val folder = File(toPath)
+                if (!folder.exists()) {
+                    folder.mkdirs()
+                }
+
+                for (file in files) {
+                    copyAssetFolder(
+                        assetManager,
+                        "$fromAssetPath/$file",
+                        "$toPath/$file"
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Помилка копіювання папки: $fromAssetPath", e)
+        }
+    }
+
+    private fun copyAssetFile(assetManager: android.content.res.AssetManager, fromAssetPath: String, toPath: String) {
+        try {
+            assetManager.open(fromAssetPath).use { inputStream ->
+                FileOutputStream(toPath).use { outputStream ->
+                    inputStream.copyTo(outputStream)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Помилка копіювання файлу: $fromAssetPath", e)
+        }
+    }
+
+    fun hasAudioPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.RECORD_AUDIO
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    fun startRecognition() {
+        if (!hasAudioPermission()) {
+            onError("Немає дозволу на використання мікрофона")
             return
         }
 
-        createSpeechRecognizer()
-
-        if (isListening) {
-            Log.d(TAG, "Already listening, cancelling and restarting.")
-            speechRecognizer?.cancel()
+        if (isRecording) {
+            Log.w(TAG, "Розпізнавання вже триває")
+            return
         }
 
-        val recognizerIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US")
-            putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, context.packageName)
-            putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
-            putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true)
-            putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
+        if (recognizer == null) {
+            onError("Модель не ініціалізована")
+            return
         }
 
-        speechRecognizer?.startListening(recognizerIntent)
-        isListening = true
-        Log.d(TAG, "Started listening for speech.")
+        try {
+            val bufferSize = AudioRecord.getMinBufferSize(
+                SAMPLE_RATE,
+                AudioFormat.CHANNEL_IN_MONO,
+                AudioFormat.ENCODING_PCM_16BIT
+            )
+
+            // Додатково обробляємо SecurityException при створенні AudioRecord
+            audioRecord = try {
+                AudioRecord(
+                    MediaRecorder.AudioSource.MIC,
+                    SAMPLE_RATE,
+                    AudioFormat.CHANNEL_IN_MONO,
+                    AudioFormat.ENCODING_PCM_16BIT,
+                    bufferSize
+                )
+            } catch (se: SecurityException) {
+                onError("Немає дозволу на використання мікрофона (SecurityException)")
+                return
+            }
+
+            val audioRecordState = audioRecord?.state ?: AudioRecord.STATE_UNINITIALIZED
+            if (audioRecordState != AudioRecord.STATE_INITIALIZED) {
+                onError("Не вдалося ініціалізувати AudioRecord")
+                return
+            }
+
+            isRecording = true
+
+            audioRecord?.startRecording()
+
+            recognitionJob = CoroutineScope(Dispatchers.IO).launch {
+                processAudio()
+            }
+
+            Log.d(TAG, "Розпізнавання розпочато")
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Помилка початку розпізнавання", e)
+            onError("Помилка початку розпізнавання: ${e.message}")
+        }
     }
 
-    fun stopListening() {
-        isListening = false
-        speechRecognizer?.stopListening()
-        Log.d(TAG, "Stopped listening for speech.")
+    fun stopRecognition() {
+        isRecording = false
+        recognitionJob?.cancel()
+
+        audioRecord?.apply {
+            val currentState = state
+            if (currentState == AudioRecord.STATE_INITIALIZED) {
+                try {
+                    stop()
+                } catch (e: IllegalStateException) {
+                    Log.w(TAG, "AudioRecord вже зупинено", e)
+                }
+            }
+            release()
+        }
+        audioRecord = null
+
+        recognizer?.let { rec ->
+            val finalResult = rec.finalResult
+            if (finalResult.isNotEmpty()) {
+                try {
+                    val jsonResult = JSONObject(finalResult)
+                    val text = jsonResult.optString("text", "")
+                    if (text.isNotEmpty()) {
+                        onResult(text)
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Помилка парсингу фінального результату", e)
+                }
+            }
+        }
+
+        Log.d(TAG, "Розпізнавання зупинено")
     }
 
-    fun destroy() {
-        isListening = false
-        speechRecognizer?.destroy()
-        speechRecognizer = null
-        Log.d(TAG, "Destroyed SpeechRecognizer and released resources.")
+    private suspend fun processAudio() = withContext(Dispatchers.IO) {
+        val buffer = ByteArray(4096)
+
+        while (isRecording && audioRecord != null) {
+            val currentAudioRecord = audioRecord
+            if (currentAudioRecord == null) break
+
+            val bytesRead = try {
+                currentAudioRecord.read(buffer, 0, buffer.size)
+            } catch (e: SecurityException) {
+                Log.e(TAG, "Втрачено дозвіл на мікрофон", e)
+                withContext(Dispatchers.Main) {
+                    onError("Втрачено дозвіл на мікрофон")
+                }
+                break
+            } catch (e: Exception) {
+                Log.e(TAG, "Помилка читання аудіо", e)
+                break
+            }
+
+            if (bytesRead > 0) {
+                recognizer?.let { rec ->
+                    val acceptResult = try {
+                        rec.acceptWaveForm(buffer, bytesRead)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Помилка обробки аудіо", e)
+                        false
+                    }
+
+                    if (acceptResult) {
+                        val result = rec.result
+                        try {
+                            val jsonResult = JSONObject(result)
+                            val text = jsonResult.optString("text", "")
+                            if (text.isNotEmpty()) {
+                                withContext(Dispatchers.Main) {
+                                    onResult(text)
+                                }
+                            } else {
+                                Unit
+                            }
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Помилка парсингу результату", e)
+                        }
+                    } else {
+                        val partialResult = rec.partialResult
+                        try {
+                            val jsonResult = JSONObject(partialResult)
+                            val partial = jsonResult.optString("partial", "")
+                            if (partial.isNotEmpty()) {
+                                withContext(Dispatchers.Main) {
+                                    onPartialResult(partial)
+                                }
+                            } else {
+                                Unit
+                            }
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Помилка парсингу часткового результату", e)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun cleanup() {
+        stopRecognition()
+        recognizer?.close()
+        model?.close()
+        recognizer = null
+        model = null
     }
 }

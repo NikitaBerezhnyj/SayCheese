@@ -16,8 +16,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 fun SettingsDialog(
     gridEnabled: Boolean,
     timerSeconds: Int,
+    listeningEnabled: Boolean,
     onGridChange: (Boolean) -> Unit,
     onTimerChange: (Int) -> Unit,
+    onListeningChange: (Boolean) -> Unit,
     onDismissRequest: () -> Unit
 ) {
     var timerText by remember { mutableStateOf(timerSeconds.toString()) }
@@ -28,7 +30,6 @@ fun SettingsDialog(
         title = { Text("Налаштування") },
         text = {
             Column(modifier = Modifier.fillMaxWidth()) {
-                // Сітка
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
@@ -39,6 +40,20 @@ fun SettingsDialog(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Показувати сітку")
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Checkbox(
+                        checked = listeningEnabled,
+                        onCheckedChange = onListeningChange
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Слухання команд")
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))

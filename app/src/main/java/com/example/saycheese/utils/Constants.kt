@@ -17,9 +17,12 @@ object Constants {
     const val KEY_FLASH_ENABLED = "flash_enabled"
     const val KEY_GRID_ENABLED = "grid_enabled"
     const val KEY_TIMER_SECONDS = "timer_seconds"
+    const val KEY_SPEECH_RECOGNIZATION = "speech_recognization"
     
     const val DEFAULT_LENS_FACING = CameraSelector.LENS_FACING_BACK
     const val DEFAULT_FLASH_ENABLED = false
     const val DEFAULT_GRID_ENABLED = true
     const val DEFAULT_TIMER_SECONDS = 3
+    const val DEFAULT_SPEECH_RECOGNIZATION = true
+
 }

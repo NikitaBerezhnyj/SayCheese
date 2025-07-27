@@ -40,6 +40,7 @@ android {
 }
 
 val cameraxVersion = "1.3.0"
+val voskVersion = "0.4.0-alpha0"
 
 dependencies {
     implementation(libs.androidx.core.ktx)
@@ -67,4 +68,5 @@ dependencies {
     implementation("androidx.camera:camera-view:${cameraxVersion}")
     implementation("androidx.camera:camera-extensions:${cameraxVersion}")
     implementation("androidx.compose.material:material-icons-extended:1.5.4")
+    implementation("com.alphacephei:vosk-android:0.3.47")
 }
