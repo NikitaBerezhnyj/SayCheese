@@ -16,6 +16,10 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+        }
     }
 
     buildTypes {
@@ -25,6 +29,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+
+        debug {
+            isMinifyEnabled = false
         }
     }
     compileOptions {
@@ -40,7 +48,6 @@ android {
 }
 
 val cameraxVersion = "1.3.0"
-val voskVersion = "0.4.0-alpha0"
 
 dependencies {
     implementation(libs.androidx.core.ktx)
@@ -69,4 +76,5 @@ dependencies {
     implementation("androidx.camera:camera-extensions:${cameraxVersion}")
     implementation("androidx.compose.material:material-icons-extended:1.5.4")
     implementation("com.alphacephei:vosk-android:0.3.47")
+    implementation("net.java.dev.jna:jna:5.13.0@aar")
 }

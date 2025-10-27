@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-07-21T09:06:10.624129018Z">
+        <DropdownSelection timestamp="2025-10-27T08:54:08.375852800Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=/home/nikita/.var/app/com.google.AndroidStudio/config/.android/avd/Pixel_5_API_33.avd" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\nikit\.android\avd\Medium_Phone.avd" />
             </handle>
           </Target>
         </DropdownSelection>
