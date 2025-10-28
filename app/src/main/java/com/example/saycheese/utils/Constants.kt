@@ -1,16 +1,22 @@
 package com.example.saycheese.utils
 
 import android.Manifest
+import android.os.Build
 import androidx.camera.core.CameraSelector
 
 object Constants {
     const val REQUEST_CODE_PERMISSIONS = 10
-    val REQUIRED_PERMISSIONS = arrayOf(
-        Manifest.permission.CAMERA,
-        Manifest.permission.RECORD_AUDIO,
-        Manifest.permission.READ_EXTERNAL_STORAGE,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE
-    )
+    val REQUIRED_PERMISSIONS = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        arrayOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.RECORD_AUDIO
+        )
+    } else {
+        arrayOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.RECORD_AUDIO
+        )
+    }
 
     const val PREFS_NAME = "say_cheese_prefs"
     const val KEY_LENS_FACING = "lens_facing"

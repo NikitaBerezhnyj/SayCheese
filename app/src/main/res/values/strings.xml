@@ -1,8 +1,22 @@
 <resources>
     <string name="app_name">SayCheese</string>
 
+    <!-- Splash Screen -->
+    <string name="splash_subtitle">Say Cheese and Smile!</string>
+
+    <!-- Permission Screen -->
+    <string name="permission_title">Camera Access Required</string>
+    <string name="permission_description">To capture amazing photos and use voice commands, we need access to your camera and microphone.</string>
+    <string name="permission_camera_title">Camera</string>
+    <string name="permission_camera_desc">Take photos and record videos</string>
+    <string name="permission_mic_title">Microphone</string>
+    <string name="permission_mic_desc">Voice commands like "Cheese!"</string>
+    <string name="permission_note">Your privacy is important. We only use these permissions for camera features.</string>
+
     <!-- Permissions -->
+    <string name="grant_permissions">Grant Permissions</string>
     <string name="permission_required">Allow access to the camera and microphone</string>
+    <string name="permission_required_self">Please grant permissions via your device settings</string>
 
     <!-- Speech recognition statuses -->
     <string name="speech_init">Preparing...</string>

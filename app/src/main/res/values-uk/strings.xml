@@ -1,8 +1,22 @@
 <resources>
     <string name="app_name">SayCheese</string>
 
+    <!-- Splash Screen -->
+    <string name="splash_subtitle">Скажи «Сир» і посміхнись!</string>
+
+    <!-- Permission Screen -->
+    <string name="permission_title">Потрібен доступ до камери</string>
+    <string name="permission_description">Щоб робити чудові фото та користуватись голосовими командами, нам потрібен доступ до вашої камери та мікрофона.</string>
+    <string name="permission_camera_title">Камера</string>
+    <string name="permission_camera_desc">Робити фото та записувати відео</string>
+    <string name="permission_mic_title">Мікрофон</string>
+    <string name="permission_mic_desc">Голосові команди, наприклад «Сир!»</string>
+    <string name="permission_note">Ми дбаємо про вашу приватність. Ці дозволи використовуються лише для функцій камери.</string>
+
     <!-- Permissions -->
+    <string name="grant_permissions">Надати дозволи</string>
     <string name="permission_required">Дозвольте доступ до камери й мікрофона</string>
+    <string name="permission_required_self">Будь ласка, надайте дозволи через налаштування пристрою</string>
 
     <!-- Speech recognition statuses -->
     <string name="speech_init">Підготовка...</string>
