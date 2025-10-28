@@ -126,24 +126,6 @@ fun CameraScreen() {
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer); speechHelper.release() }
     }
 
-    val speechStatusText = when (speechStatusKey) {
-        SpeechStatusKey.INIT -> stringResource(R.string.speech_init)
-        SpeechStatusKey.LOADING -> stringResource(R.string.speech_loading_model)
-        SpeechStatusKey.READY -> stringResource(R.string.speech_ready)
-        SpeechStatusKey.ERROR_INIT -> stringResource(R.string.speech_error_init)
-        SpeechStatusKey.LISTENING -> stringResource(R.string.speech_listening)
-        SpeechStatusKey.PAUSED -> stringResource(R.string.speech_paused)
-        SpeechStatusKey.STOPPED -> stringResource(R.string.speech_stopped)
-        SpeechStatusKey.INACTIVE -> stringResource(R.string.speech_inactive,
-            when (inactiveReason) {
-                "disabled" -> stringResource(R.string.reason_disabled)
-                "loading" -> stringResource(R.string.reason_loading)
-                "not ready" -> stringResource(R.string.reason_not_ready)
-                else -> stringResource(R.string.reason_unknown)
-            }
-        )
-    }
-
     if (!hasPermissions) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(
@@ -188,9 +170,20 @@ fun CameraScreen() {
                     imageCapture = imageCapture,
                     lensFacing = lensFacing
                 )
+
                 if (gridEnabled) GridOverlay()
                 if (flashVisible) FlashOverlay { flashVisible = false }
                 if (timerActive) TimerCounter(timerSeconds, ::onTimerFinish, Modifier.align(Alignment.Center))
+
+                // Новий індикатор статусу розпізнавання мови (правий верхній кут)
+                if (speechRecognitionEnabled) {
+                    SpeechStatusIndicator(
+                        statusKey = speechStatusKey,
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(top = 16.dp, end = 16.dp)
+                    )
+                }
             }
 
             BottomBar(
@@ -210,18 +203,6 @@ fun CameraScreen() {
                     }
                 }
             )
-        }
-
-        if (speechRecognitionEnabled) {
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 120.dp)
-                    .background(Color.Black.copy(alpha = 0.7f))
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-            ) {
-                Text(text = speechStatusText, color = Color.White)
-            }
         }
 
         if (settingsVisible) {
