@@ -5,12 +5,15 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.*
 import androidx.core.app.ActivityCompat
 import com.example.saycheese.ui.screens.CameraScreen
+import com.example.saycheese.ui.screens.SplashScreenContent
 import com.example.saycheese.ui.theme.SayCheeseTheme
 import com.example.saycheese.utils.Constants
 import com.example.saycheese.utils.LocaleUtils
 import com.example.saycheese.utils.PermissionUtils
+import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
 
@@ -35,7 +38,18 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             SayCheeseTheme {
-                CameraScreen()
+                var showSplash by remember { mutableStateOf(true) }
+
+                LaunchedEffect(Unit) {
+                    delay(1500)
+                    showSplash = false
+                }
+
+                if (showSplash) {
+                    SplashScreenContent()
+                } else {
+                    CameraScreen()
+                }
             }
         }
     }
