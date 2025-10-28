@@ -15,7 +15,6 @@ fun GridOverlay() {
             val thirdWidth = width / 3
             val thirdHeight = height / 3
 
-            // Вертикальні лінії
             for (i in 1..2) {
                 drawLine(
                     color = Color.White.copy(alpha = 0.6f),
@@ -25,7 +24,6 @@ fun GridOverlay() {
                 )
             }
 
-            // Горизонтальні лінії
             for (i in 1..2) {
                 drawLine(
                     color = Color.White.copy(alpha = 0.6f),

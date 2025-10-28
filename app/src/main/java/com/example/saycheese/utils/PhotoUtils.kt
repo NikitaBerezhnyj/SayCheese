@@ -8,14 +8,13 @@ import android.widget.Toast
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.core.content.ContextCompat
+import com.example.saycheese.R
 
 fun takePhoto(
     context: Context,
     imageCapture: ImageCapture,
     onPhotoSaved: () -> Unit
 ) {
-    Log.d("CameraX", "takePhoto called")
-
     val contentValues = ContentValues().apply {
         put(MediaStore.MediaColumns.DISPLAY_NAME, "photo_${System.currentTimeMillis()}.jpg")
         put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
@@ -28,27 +27,37 @@ fun takePhoto(
         contentValues
     ).build()
 
-    Log.d("CameraX", "Starting photo capture...")
     imageCapture.takePicture(
         outputOptions,
         ContextCompat.getMainExecutor(context),
         object : ImageCapture.OnImageSavedCallback {
             override fun onError(exc: ImageCaptureException) {
                 val errorMessage = when (exc.imageCaptureError) {
-                    ImageCapture.ERROR_INVALID_CAMERA -> "Недійсна камера"
-                    ImageCapture.ERROR_CAPTURE_FAILED -> "Не вдалося зробити фото"
-                    ImageCapture.ERROR_FILE_IO -> "Помилка запису файлу"
-                    ImageCapture.ERROR_CAMERA_CLOSED -> "Камера закрита"
-                    ImageCapture.ERROR_UNKNOWN -> "Невідома помилка"
-                    else -> "Помилка фотографування"
+                    ImageCapture.ERROR_INVALID_CAMERA -> context.getString(R.string.photo_error_invalid_camera)
+                    ImageCapture.ERROR_CAPTURE_FAILED -> context.getString(R.string.photo_error_capture_failed)
+                    ImageCapture.ERROR_FILE_IO -> context.getString(R.string.photo_error_file_io)
+                    ImageCapture.ERROR_CAMERA_CLOSED -> context.getString(R.string.photo_error_camera_closed)
+                    ImageCapture.ERROR_UNKNOWN -> context.getString(R.string.photo_error_unknown)
+                    else -> context.getString(R.string.photo_error_generic)
                 }
-                Log.e("CameraX", "Помилка збереження фото: $errorMessage (${exc.imageCaptureError}): ${exc.message}", exc)
-                Toast.makeText(context, "Помилка: $errorMessage", Toast.LENGTH_LONG).show()
+
+                Log.e("CameraX", "Photo save failed: $errorMessage (Error code: ${exc.imageCaptureError})", exc)
+
+                Toast.makeText(
+                    context,
+                    "Failed to save photo: $errorMessage",
+                    Toast.LENGTH_LONG
+                ).show()
             }
 
             override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                Log.d("CameraX", "✅ Фото збережено в галерею: ${output.savedUri}")
-                Toast.makeText(context, "Фото збережено", Toast.LENGTH_SHORT).show()
+                Log.i("CameraX", "Photo successfully saved at: ${output.savedUri}")
+
+                Toast.makeText(
+                    context,
+                    "Photo successfully saved",
+                    Toast.LENGTH_LONG
+                ).show()
                 onPhotoSaved()
             }
         }

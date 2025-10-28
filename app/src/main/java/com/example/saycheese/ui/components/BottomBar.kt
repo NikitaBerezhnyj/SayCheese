@@ -16,7 +16,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.saycheese.R
 
 @Composable
 fun BottomBar(
@@ -26,6 +28,8 @@ fun BottomBar(
     onSwitchCamera: () -> Unit
 ) {
     val context = LocalContext.current
+    val cameraNotReadyText = stringResource(R.string.camera_not_ready)
+
 
     Row(
         modifier = Modifier
@@ -42,7 +46,7 @@ fun BottomBar(
                 val currentImageCapture = imageCapture.value
                 if (currentImageCapture == null) {
                     Log.e("CameraX", "ImageCapture is null when trying to start timer")
-                    Toast.makeText(context, "Камера не готова. Спробуйте ще раз.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, cameraNotReadyText, Toast.LENGTH_SHORT).show()
                     return@IconButton
                 }
                 onTakePhotoWithTimer()
@@ -50,7 +54,7 @@ fun BottomBar(
         ) {
             Icon(
                 imageVector = Icons.Filled.Timer,
-                contentDescription = "Take Photo with Timer",
+                contentDescription = stringResource(R.string.desc_take_photo_with_timer),
                 tint = Color.White,
                 modifier = Modifier.size(28.dp)
             )
@@ -62,7 +66,7 @@ fun BottomBar(
                 val currentImageCapture = imageCapture.value
                 if (currentImageCapture == null) {
                     Log.e("CameraX", "ImageCapture is null when trying to take photo")
-                    Toast.makeText(context, "Камера не готова. Спробуйте ще раз.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, cameraNotReadyText, Toast.LENGTH_SHORT).show()
                     return@IconButton
                 }
                 onTakePhoto()
@@ -74,7 +78,7 @@ fun BottomBar(
         ) {
             Icon(
                 imageVector = Icons.Filled.CameraEnhance,
-                contentDescription = "Take Photo",
+                contentDescription = stringResource(R.string.desc_take_photo),
                 tint = Color.Black,
                 modifier = Modifier.size(32.dp)
             )
@@ -86,7 +90,7 @@ fun BottomBar(
         ) {
             Icon(
                 imageVector = Icons.Filled.ChangeCircle,
-                contentDescription = "Switch Camera",
+                contentDescription = stringResource(R.string.desc_switch_camera),
                 tint = Color.White,
                 modifier = Modifier.size(36.dp)
             )

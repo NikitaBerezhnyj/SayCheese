@@ -28,14 +28,13 @@ fun CameraPreview(
 
     AndroidView(
         factory = { ctx ->
-            val previewView = PreviewView(ctx).apply {
+            PreviewView(ctx).apply {
                 layoutParams = ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT
                 )
                 scaleType = PreviewView.ScaleType.FILL_CENTER
             }
-            previewView
         },
         update = { previewView ->
             cameraProviderFuture.addListener({
@@ -58,10 +57,8 @@ fun CameraPreview(
                         preview,
                         capture
                     )
-
-                    Log.d("CameraX", "Camera rebound with selector: $lensFacing, flash: $flashEnabled")
                 } catch (e: Exception) {
-                    Log.e("CameraPreview", "Помилка ініціалізації: ${e.message}", e)
+                    Log.e("CameraPreview", "Camera initialization failed: ${e.message}", e)
                 }
             }, ContextCompat.getMainExecutor(context))
         },

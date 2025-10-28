@@ -1,0 +1,51 @@
+<resources>
+    <string name="app_name">SayCheese</string>
+
+    <!-- Permissions -->
+    <string name="permission_required">Дозвольте доступ до камери й мікрофона</string>
+
+    <!-- Speech recognition statuses -->
+    <string name="speech_init">Підготовка...</string>
+    <string name="speech_loading_model">Завантаження...</string>
+    <string name="speech_ready">Готово до роботи</string>
+    <string name="speech_error_init">Не вдалося запустити розпізнавання</string>
+    <string name="speech_listening">Слухаю...</string>
+    <string name="speech_paused">Призупинено</string>
+    <string name="speech_stopped">Зупинено</string>
+    <string name="speech_inactive">Розпізнавання вимкнено: %1$s</string>
+
+    <!-- Reasons why speech is inactive -->
+    <string name="reason_disabled">вимкнено</string>
+    <string name="reason_loading">йде підготовка</string>
+    <string name="reason_not_ready">ще не готово</string>
+    <string name="reason_unknown">невідомо</string>
+
+    <!-- Photo capture -->
+    <string name="photo_error_invalid_camera">Проблема з камерою</string>
+    <string name="photo_error_capture_failed">Не вдалося зробити фото</string>
+    <string name="photo_error_file_io">Помилка збереження</string>
+    <string name="photo_error_camera_closed">Камеру закрито</string>
+    <string name="photo_error_unknown">Щось пішло не так</string>
+    <string name="photo_error_generic">Помилка зйомки</string>
+    <string name="photo_saved">Фото збережено</string>
+    <string name="photo_save_error">Не вдалося зберегти: %1$s</string>
+
+    <!-- Camera state -->
+    <string name="camera_not_ready">Камера не готова. Спробуйте ще раз.</string>
+
+    <!-- Settings dialog -->
+    <string name="settings_title">Налаштування</string>
+    <string name="settings_show_grid">Сітка на екрані</string>
+    <string name="settings_listening">Голосові команди</string>
+    <string name="settings_timer_label">Таймер, с:</string>
+    <string name="settings_timer_error">Введіть число 0 або більше</string>
+    <string name="settings_language">Мова</string>
+    <string name="settings_language_ukrainian">Українська</string>
+    <string name="settings_language_english">English</string>
+    <string name="settings_close">Готово</string>
+
+    <!-- Accessibility / descriptions -->
+    <string name="desc_take_photo">Фото</string>
+    <string name="desc_take_photo_with_timer">Фото з таймером</string>
+    <string name="desc_switch_camera">Перемкнути камеру</string>
+</resources>

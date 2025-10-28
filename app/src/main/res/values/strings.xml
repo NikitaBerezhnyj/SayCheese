@@ -1,3 +1,51 @@
 <resources>
     <string name="app_name">SayCheese</string>
+
+    <!-- Permissions -->
+    <string name="permission_required">Allow access to the camera and microphone</string>
+
+    <!-- Speech recognition statuses -->
+    <string name="speech_init">Preparing...</string>
+    <string name="speech_loading_model">Loading...</string>
+    <string name="speech_ready">Ready</string>
+    <string name="speech_error_init">Failed to start recognition</string>
+    <string name="speech_listening">Listening...</string>
+    <string name="speech_paused">Paused</string>
+    <string name="speech_stopped">Stopped</string>
+    <string name="speech_inactive">Recognition disabled: %1$s</string>
+
+    <!-- Reasons why speech is inactive -->
+    <string name="reason_disabled">disabled</string>
+    <string name="reason_loading">initializing</string>
+    <string name="reason_not_ready">not ready yet</string>
+    <string name="reason_unknown">unknown</string>
+
+    <!-- Photo capture -->
+    <string name="photo_error_invalid_camera">Camera error</string>
+    <string name="photo_error_capture_failed">Failed to capture photo</string>
+    <string name="photo_error_file_io">File saving error</string>
+    <string name="photo_error_camera_closed">Camera closed</string>
+    <string name="photo_error_unknown">Something went wrong</string>
+    <string name="photo_error_generic">Capture error</string>
+    <string name="photo_saved">Photo saved</string>
+    <string name="photo_save_error">Failed to save: %1$s</string>
+
+    <!-- Camera state -->
+    <string name="camera_not_ready">Camera not ready. Please try again.</string>
+
+    <!-- Settings dialog -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_show_grid">Show grid</string>
+    <string name="settings_listening">Voice commands</string>
+    <string name="settings_timer_label">Timer, s:</string>
+    <string name="settings_timer_error">Enter a number 0 or greater</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_language_ukrainian">Українська</string>
+    <string name="settings_language_english">English</string>
+    <string name="settings_close">Done</string>
+
+    <!-- Accessibility / descriptions -->
+    <string name="desc_take_photo">Take photo</string>
+    <string name="desc_take_photo_with_timer">Take photo with timer</string>
+    <string name="desc_switch_camera">Switch camera</string>
 </resources>

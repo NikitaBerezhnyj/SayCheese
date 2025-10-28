@@ -12,9 +12,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import com.example.saycheese.R
 import com.example.saycheese.data.CameraSettingsManager
 import com.example.saycheese.ui.components.*
 import com.example.saycheese.utils.PermissionUtils
@@ -23,6 +25,10 @@ import com.example.saycheese.utils.takePhoto
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+enum class SpeechStatusKey {
+    INIT, LOADING, READY, ERROR_INIT, LISTENING, PAUSED, STOPPED, INACTIVE
+}
+
 @Composable
 fun CameraScreen() {
     val context = LocalContext.current
@@ -30,7 +36,7 @@ fun CameraScreen() {
     val coroutineScope = rememberCoroutineScope()
     val settingsManager = remember { CameraSettingsManager(context) }
 
-    val (savedLensFacing, savedFlashEnabled, savedGridEnabled, savedTimeSecond, savedSpeechRecognizationEnabled) =
+    val (savedLensFacing, savedFlashEnabled, savedGridEnabled, savedTimeSecond, savedSpeechRecognitionEnabled) =
         settingsManager.loadCameraSettings()
 
     var lensFacing by remember { mutableStateOf(savedLensFacing) }
@@ -42,7 +48,7 @@ fun CameraScreen() {
     var settingsVisible by remember { mutableStateOf(false) }
     var timerSeconds by remember { mutableStateOf(savedTimeSecond) }
     var timerActive by remember { mutableStateOf(false) }
-    var speechRecognizationEnabled by remember { mutableStateOf(savedSpeechRecognizationEnabled) }
+    var speechRecognitionEnabled by remember { mutableStateOf(savedSpeechRecognitionEnabled) }
 
     val hasPermissions = remember {
         PermissionUtils.hasCameraPermission(context) && PermissionUtils.hasAudioPermission(context)
@@ -50,41 +56,16 @@ fun CameraScreen() {
 
     val speechHelper = remember { SpeechRecognizerHelper(context) }
     var speechModelInitialized by remember { mutableStateOf(false) }
-    var speechStatus by remember { mutableStateOf("Ініціалізація...") }
-
-    LaunchedEffect(Unit) {
-        if (hasPermissions) {
-            speechStatus = "Завантаження моделі..."
-            try {
-                speechHelper.initModel()
-                speechModelInitialized = true
-                speechStatus = "Модель готова до роботи"
-                Log.d("SpeechRecognition", "Vosk model loaded successfully")
-            } catch (e: Exception) {
-                Log.e("SpeechRecognition", "Model init failed", e)
-                speechStatus = "Помилка ініціалізації моделі"
-                speechModelInitialized = false
-            }
-        }
-    }
+    var speechStatusKey by remember { mutableStateOf(SpeechStatusKey.INIT) }
+    var inactiveReason by remember { mutableStateOf("") }
 
     fun takePicture() {
-        val capture = imageCapture.value
-        if (capture == null) {
-            Log.e("CameraX", "❌ ImageCapture is null - camera not ready yet")
-            return
-        }
-        Log.d("CameraX", "✅ Taking picture with valid ImageCapture")
+        val capture = imageCapture.value ?: return
         takePhoto(context, capture) { flashVisible = true }
     }
 
     fun startTimerPhoto() {
-        if (timerSeconds > 0) {
-            timerActive = true
-            Log.d("TIMER_BUTTON", "Timer started for $timerSeconds seconds")
-        } else {
-            takePicture()
-        }
+        if (timerSeconds > 0) timerActive = true else takePicture()
     }
 
     fun onTimerFinish() {
@@ -95,58 +76,80 @@ fun CameraScreen() {
         }
     }
 
-    DisposableEffect(lifecycleOwner, speechModelInitialized, speechRecognizationEnabled) {
+    LaunchedEffect(hasPermissions) {
+        if (hasPermissions) {
+            speechStatusKey = SpeechStatusKey.LOADING
+            try {
+                speechHelper.initModel()
+                speechModelInitialized = true
+                speechStatusKey = SpeechStatusKey.READY
+            } catch (e: Exception) {
+                Log.e("SpeechRecognition", "Speech model initialization failed", e)
+                speechModelInitialized = false
+                speechStatusKey = SpeechStatusKey.ERROR_INIT
+            }
+        }
+    }
+
+    DisposableEffect(lifecycleOwner, speechModelInitialized, speechRecognitionEnabled) {
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
                 Lifecycle.Event.ON_RESUME -> {
-                    Log.d("SpeechRecognition", "ON_RESUME event")
-                    if (speechRecognizationEnabled && speechModelInitialized && speechHelper.isModelReady()) {
-                        Log.d("SpeechRecognition", "✅ Starting listening...")
+                    if (speechRecognitionEnabled && speechModelInitialized && speechHelper.isModelReady()) {
                         speechHelper.startListening(
-                            onCheeseHeard = {
-                                Log.d("SpeechRecognition", "🧀 Cheese command received!")
-                                if (!timerActive) takePicture()
-                            },
-                            onTimerHeard = {
-                                Log.d("SpeechRecognition", "⏱️ Timer command received!")
-                                if (!timerActive) startTimerPhoto()
-                            }
+                            onCheeseHeard = { if (!timerActive) takePicture() },
+                            onTimerHeard = { if (!timerActive) startTimerPhoto() }
                         )
-                        speechStatus = "🎤 Слухаю команду..."
+                        speechStatusKey = SpeechStatusKey.LISTENING
                     } else {
-                        val reason = when {
-                            !speechRecognizationEnabled -> "вимкнено в налаштуваннях"
-                            !speechModelInitialized -> "модель ще завантажується"
-                            !speechHelper.isModelReady() -> "модель не готова"
-                            else -> "невідома причина"
+                        inactiveReason = when {
+                            !speechRecognitionEnabled -> "disabled"
+                            !speechModelInitialized -> "loading"
+                            !speechHelper.isModelReady() -> "not ready"
+                            else -> "unknown"
                         }
-                        speechStatus = "Розпізнавання не активне: $reason"
-                        Log.d("SpeechRecognition", "Not starting listener: $reason")
+                        speechStatusKey = SpeechStatusKey.INACTIVE
                     }
                 }
                 Lifecycle.Event.ON_PAUSE -> {
-                    Log.d("SpeechRecognition", "ON_PAUSE event - stopping listener")
                     speechHelper.stopListening()
-                    speechStatus = "⏸️ Призупинено"
+                    speechStatusKey = SpeechStatusKey.PAUSED
                 }
                 Lifecycle.Event.ON_DESTROY -> {
-                    Log.d("SpeechRecognition", "ON_DESTROY event - releasing resources")
                     speechHelper.release()
-                    speechStatus = "⏹️ Розпізнавач зупинено"
+                    speechStatusKey = SpeechStatusKey.STOPPED
                 }
                 else -> {}
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-            speechHelper.release()
-        }
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer); speechHelper.release() }
+    }
+
+    val speechStatusText = when (speechStatusKey) {
+        SpeechStatusKey.INIT -> stringResource(R.string.speech_init)
+        SpeechStatusKey.LOADING -> stringResource(R.string.speech_loading_model)
+        SpeechStatusKey.READY -> stringResource(R.string.speech_ready)
+        SpeechStatusKey.ERROR_INIT -> stringResource(R.string.speech_error_init)
+        SpeechStatusKey.LISTENING -> stringResource(R.string.speech_listening)
+        SpeechStatusKey.PAUSED -> stringResource(R.string.speech_paused)
+        SpeechStatusKey.STOPPED -> stringResource(R.string.speech_stopped)
+        SpeechStatusKey.INACTIVE -> stringResource(R.string.speech_inactive,
+            when (inactiveReason) {
+                "disabled" -> stringResource(R.string.reason_disabled)
+                "loading" -> stringResource(R.string.reason_loading)
+                "not ready" -> stringResource(R.string.reason_not_ready)
+                else -> stringResource(R.string.reason_unknown)
+            }
+        )
     }
 
     if (!hasPermissions) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text(text = "Потрібен дозвіл на камеру та мікрофон", color = Color.White)
+            Text(
+                text = stringResource(R.string.permission_required),
+                color = Color.White
+            )
         }
         return
     }
@@ -166,7 +169,7 @@ fun CameraScreen() {
                 onFlashToggle = {
                     flashEnabled = !flashEnabled
                     settingsManager.saveCameraSettings(
-                        lensFacing, flashEnabled, gridEnabled, timerSeconds, speechRecognizationEnabled
+                        lensFacing, flashEnabled, gridEnabled, timerSeconds, speechRecognitionEnabled
                     )
                 },
                 onSettingsClick = { settingsVisible = true }
@@ -187,8 +190,7 @@ fun CameraScreen() {
                 )
                 if (gridEnabled) GridOverlay()
                 if (flashVisible) FlashOverlay { flashVisible = false }
-                if (timerActive)
-                    TimerCounter(timerSeconds, ::onTimerFinish, Modifier.align(Alignment.Center))
+                if (timerActive) TimerCounter(timerSeconds, ::onTimerFinish, Modifier.align(Alignment.Center))
             }
 
             BottomBar(
@@ -203,14 +205,14 @@ fun CameraScreen() {
                             else
                                 CameraSelector.LENS_FACING_BACK
                         settingsManager.saveCameraSettings(
-                            lensFacing, flashEnabled, gridEnabled, timerSeconds, speechRecognizationEnabled
+                            lensFacing, flashEnabled, gridEnabled, timerSeconds, speechRecognitionEnabled
                         )
                     }
                 }
             )
         }
 
-        if (speechRecognizationEnabled) {
+        if (speechRecognitionEnabled) {
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -218,7 +220,7 @@ fun CameraScreen() {
                     .background(Color.Black.copy(alpha = 0.7f))
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
-                Text(text = speechStatus, color = Color.White)
+                Text(text = speechStatusText, color = Color.White)
             }
         }
 
@@ -229,19 +231,19 @@ fun CameraScreen() {
                 onGridChange = {
                     gridEnabled = it
                     settingsManager.saveCameraSettings(
-                        lensFacing, flashEnabled, gridEnabled, timerSeconds, speechRecognizationEnabled
+                        lensFacing, flashEnabled, gridEnabled, timerSeconds, speechRecognitionEnabled
                     )
                 },
                 onTimerChange = {
                     timerSeconds = it
                     settingsManager.saveCameraSettings(
-                        lensFacing, flashEnabled, gridEnabled, timerSeconds, speechRecognizationEnabled
+                        lensFacing, flashEnabled, gridEnabled, timerSeconds, speechRecognitionEnabled
                     )
                 },
                 onDismissRequest = { settingsVisible = false },
-                listeningEnabled = speechRecognizationEnabled,
+                listeningEnabled = speechRecognitionEnabled,
                 onListeningChange = { enabled ->
-                    speechRecognizationEnabled = enabled
+                    speechRecognitionEnabled = enabled
                     settingsManager.saveCameraSettings(
                         lensFacing, flashEnabled, gridEnabled, timerSeconds, enabled
                     )
@@ -250,10 +252,10 @@ fun CameraScreen() {
                             onCheeseHeard = { if (!timerActive) takePicture() },
                             onTimerHeard = { if (!timerActive) startTimerPhoto() }
                         )
-                        speechStatus = "🎤 Слухаю команду..."
+                        speechStatusKey = SpeechStatusKey.LISTENING
                     } else {
                         speechHelper.stopListening()
-                        speechStatus = "⏸️ Призупинено"
+                        speechStatusKey = SpeechStatusKey.PAUSED
                     }
                 }
             )
