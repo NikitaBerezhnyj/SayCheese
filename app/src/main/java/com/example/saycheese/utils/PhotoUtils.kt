@@ -11,16 +11,10 @@ import androidx.core.content.ContextCompat
 
 fun takePhoto(
     context: Context,
-    imageCapture: ImageCapture?,
+    imageCapture: ImageCapture,
     onPhotoSaved: () -> Unit
 ) {
-    Log.d("CameraX", "takePhoto called with imageCapture: $imageCapture")
-
-    if (imageCapture == null) {
-        Log.e("CameraX", "ImageCapture is null when trying to take photo")
-        Toast.makeText(context, "Камера не готова. Спробуйте ще раз.", Toast.LENGTH_SHORT).show()
-        return
-    }
+    Log.d("CameraX", "takePhoto called")
 
     val contentValues = ContentValues().apply {
         put(MediaStore.MediaColumns.DISPLAY_NAME, "photo_${System.currentTimeMillis()}.jpg")
@@ -35,7 +29,6 @@ fun takePhoto(
     ).build()
 
     Log.d("CameraX", "Starting photo capture...")
-
     imageCapture.takePicture(
         outputOptions,
         ContextCompat.getMainExecutor(context),
@@ -49,13 +42,12 @@ fun takePhoto(
                     ImageCapture.ERROR_UNKNOWN -> "Невідома помилка"
                     else -> "Помилка фотографування"
                 }
-
                 Log.e("CameraX", "Помилка збереження фото: $errorMessage (${exc.imageCaptureError}): ${exc.message}", exc)
-                Toast.makeText(context, "Помилка збереження зображення: $errorMessage", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, "Помилка: $errorMessage", Toast.LENGTH_LONG).show()
             }
 
             override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                Log.d("CameraX", "Фото збережено в галерею: ${output.savedUri}")
+                Log.d("CameraX", "✅ Фото збережено в галерею: ${output.savedUri}")
                 Toast.makeText(context, "Фото збережено", Toast.LENGTH_SHORT).show()
                 onPhotoSaved()
             }

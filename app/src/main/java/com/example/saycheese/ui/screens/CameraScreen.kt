@@ -28,9 +28,8 @@ fun CameraScreen() {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val coroutineScope = rememberCoroutineScope()
-
-    // Зберігаємо та завантажуємо налаштування камери
     val settingsManager = remember { CameraSettingsManager(context) }
+
     val (savedLensFacing, savedFlashEnabled, savedGridEnabled, savedTimeSecond, savedSpeechRecognizationEnabled) =
         settingsManager.loadCameraSettings()
 
@@ -45,16 +44,14 @@ fun CameraScreen() {
     var timerActive by remember { mutableStateOf(false) }
     var speechRecognizationEnabled by remember { mutableStateOf(savedSpeechRecognizationEnabled) }
 
-    val hasPermissions = remember(context) {
+    val hasPermissions = remember {
         PermissionUtils.hasCameraPermission(context) && PermissionUtils.hasAudioPermission(context)
     }
 
-    // ✅ Новий допоміжний клас для розпізнавання мови
     val speechHelper = remember { SpeechRecognizerHelper(context) }
     var speechModelInitialized by remember { mutableStateOf(false) }
     var speechStatus by remember { mutableStateOf("Ініціалізація...") }
 
-    // ✅ Ініціалізація голосової моделі
     LaunchedEffect(Unit) {
         if (hasPermissions) {
             speechStatus = "Завантаження моделі..."
@@ -66,33 +63,19 @@ fun CameraScreen() {
             } catch (e: Exception) {
                 Log.e("SpeechRecognition", "Model init failed", e)
                 speechStatus = "Помилка ініціалізації моделі"
+                speechModelInitialized = false
             }
         }
     }
 
-    // --- Функції для роботи з камерою ---
     fun takePicture() {
-        Log.d("CameraX", "Taking picture now")
         val capture = imageCapture.value
         if (capture == null) {
-            Log.e("CameraX", "ImageCapture is null, camera might not be ready")
-            coroutineScope.launch {
-                delay(200)
-                if (imageCapture.value != null) {
-                    takePhoto(
-                        context = context,
-                        imageCapture = imageCapture.value,
-                        onPhotoSaved = { flashVisible = true }
-                    )
-                }
-            }
+            Log.e("CameraX", "❌ ImageCapture is null - camera not ready yet")
             return
         }
-        takePhoto(
-            context = context,
-            imageCapture = capture,
-            onPhotoSaved = { flashVisible = true }
-        )
+        Log.d("CameraX", "✅ Taking picture with valid ImageCapture")
+        takePhoto(context, capture) { flashVisible = true }
     }
 
     fun startTimerPhoto() {
@@ -106,45 +89,54 @@ fun CameraScreen() {
 
     fun onTimerFinish() {
         timerActive = false
-        Log.d("TIMER_BUTTON", "Timer finished, taking photo in 100ms")
         coroutineScope.launch {
             delay(100)
             takePicture()
         }
     }
 
-    // ✅ Реакція на життєвий цикл
     DisposableEffect(lifecycleOwner, speechModelInitialized, speechRecognizationEnabled) {
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
                 Lifecycle.Event.ON_RESUME -> {
-                    if (speechRecognizationEnabled && hasPermissions && speechModelInitialized) {
+                    Log.d("SpeechRecognition", "ON_RESUME event")
+                    if (speechRecognizationEnabled && speechModelInitialized && speechHelper.isModelReady()) {
+                        Log.d("SpeechRecognition", "✅ Starting listening...")
                         speechHelper.startListening(
                             onCheeseHeard = {
+                                Log.d("SpeechRecognition", "🧀 Cheese command received!")
                                 if (!timerActive) takePicture()
                             },
                             onTimerHeard = {
+                                Log.d("SpeechRecognition", "⏱️ Timer command received!")
                                 if (!timerActive) startTimerPhoto()
                             }
                         )
-                        speechStatus = "Слухаю команду..."
+                        speechStatus = "🎤 Слухаю команду..."
+                    } else {
+                        val reason = when {
+                            !speechRecognizationEnabled -> "вимкнено в налаштуваннях"
+                            !speechModelInitialized -> "модель ще завантажується"
+                            !speechHelper.isModelReady() -> "модель не готова"
+                            else -> "невідома причина"
+                        }
+                        speechStatus = "Розпізнавання не активне: $reason"
+                        Log.d("SpeechRecognition", "Not starting listener: $reason")
                     }
                 }
-
                 Lifecycle.Event.ON_PAUSE -> {
+                    Log.d("SpeechRecognition", "ON_PAUSE event - stopping listener")
                     speechHelper.stopListening()
-                    speechStatus = "Призупинено"
+                    speechStatus = "⏸️ Призупинено"
                 }
-
                 Lifecycle.Event.ON_DESTROY -> {
+                    Log.d("SpeechRecognition", "ON_DESTROY event - releasing resources")
                     speechHelper.release()
-                    speechStatus = "Розпізнавач зупинено"
+                    speechStatus = "⏹️ Розпізнавач зупинено"
                 }
-
                 else -> {}
             }
         }
-
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
@@ -152,18 +144,13 @@ fun CameraScreen() {
         }
     }
 
-    // Якщо немає дозволів — показуємо повідомлення
     if (!hasPermissions) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text(
-                text = "Потрібен дозвіл на камеру та мікрофон",
-                color = Color.White
-            )
+            Text(text = "Потрібен дозвіл на камеру та мікрофон", color = Color.White)
         }
         return
     }
 
-    // --- Основний UI ---
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -179,11 +166,7 @@ fun CameraScreen() {
                 onFlashToggle = {
                     flashEnabled = !flashEnabled
                     settingsManager.saveCameraSettings(
-                        lensFacing,
-                        flashEnabled,
-                        gridEnabled,
-                        timerSeconds,
-                        speechRecognizationEnabled
+                        lensFacing, flashEnabled, gridEnabled, timerSeconds, speechRecognizationEnabled
                     )
                 },
                 onSettingsClick = { settingsVisible = true }
@@ -192,8 +175,7 @@ fun CameraScreen() {
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxWidth()
-                    .background(Color.White),
+                    .fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
                 CameraPreview(
@@ -203,20 +185,10 @@ fun CameraScreen() {
                     imageCapture = imageCapture,
                     lensFacing = lensFacing
                 )
-
                 if (gridEnabled) GridOverlay()
-
-                if (flashVisible) {
-                    FlashOverlay(onAnimationEnd = { flashVisible = false })
-                }
-
-                if (timerActive) {
-                    TimerCounter(
-                        totalSeconds = timerSeconds,
-                        onTimerFinish = ::onTimerFinish,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
+                if (flashVisible) FlashOverlay { flashVisible = false }
+                if (timerActive)
+                    TimerCounter(timerSeconds, ::onTimerFinish, Modifier.align(Alignment.Center))
             }
 
             BottomBar(
@@ -225,34 +197,31 @@ fun CameraScreen() {
                 onTakePhotoWithTimer = { startTimerPhoto() },
                 onSwitchCamera = {
                     if (!timerActive) {
-                        lensFacing = if (lensFacing == CameraSelector.LENS_FACING_BACK)
-                            CameraSelector.LENS_FACING_FRONT
-                        else
-                            CameraSelector.LENS_FACING_BACK
-
+                        lensFacing =
+                            if (lensFacing == CameraSelector.LENS_FACING_BACK)
+                                CameraSelector.LENS_FACING_FRONT
+                            else
+                                CameraSelector.LENS_FACING_BACK
                         settingsManager.saveCameraSettings(
-                            lensFacing,
-                            flashEnabled,
-                            gridEnabled,
-                            timerSeconds,
-                            speechRecognizationEnabled
+                            lensFacing, flashEnabled, gridEnabled, timerSeconds, speechRecognizationEnabled
                         )
                     }
                 }
             )
         }
 
-        // Відображення статусу голосового розпізнавання
-        Box(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .background(Color.Black.copy(alpha = 0.5f))
-                .padding(8.dp)
-        ) {
-            Text(text = speechStatus, color = Color.White)
+        if (speechRecognizationEnabled) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 120.dp)
+                    .background(Color.Black.copy(alpha = 0.7f))
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                Text(text = speechStatus, color = Color.White)
+            }
         }
 
-        // Діалог налаштувань
         if (settingsVisible) {
             SettingsDialog(
                 gridEnabled = gridEnabled,
@@ -260,21 +229,13 @@ fun CameraScreen() {
                 onGridChange = {
                     gridEnabled = it
                     settingsManager.saveCameraSettings(
-                        lensFacing,
-                        flashEnabled,
-                        gridEnabled,
-                        timerSeconds,
-                        speechRecognizationEnabled
+                        lensFacing, flashEnabled, gridEnabled, timerSeconds, speechRecognizationEnabled
                     )
                 },
                 onTimerChange = {
                     timerSeconds = it
                     settingsManager.saveCameraSettings(
-                        lensFacing,
-                        flashEnabled,
-                        gridEnabled,
-                        timerSeconds,
-                        speechRecognizationEnabled
+                        lensFacing, flashEnabled, gridEnabled, timerSeconds, speechRecognizationEnabled
                     )
                 },
                 onDismissRequest = { settingsVisible = false },
@@ -282,12 +243,18 @@ fun CameraScreen() {
                 onListeningChange = { enabled ->
                     speechRecognizationEnabled = enabled
                     settingsManager.saveCameraSettings(
-                        lensFacing,
-                        flashEnabled,
-                        gridEnabled,
-                        timerSeconds,
-                        enabled
+                        lensFacing, flashEnabled, gridEnabled, timerSeconds, enabled
                     )
+                    if (enabled && speechModelInitialized && speechHelper.isModelReady()) {
+                        speechHelper.startListening(
+                            onCheeseHeard = { if (!timerActive) takePicture() },
+                            onTimerHeard = { if (!timerActive) startTimerPhoto() }
+                        )
+                        speechStatus = "🎤 Слухаю команду..."
+                    } else {
+                        speechHelper.stopListening()
+                        speechStatus = "⏸️ Призупинено"
+                    }
                 }
             )
         }
