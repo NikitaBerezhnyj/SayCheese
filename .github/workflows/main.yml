@@ -35,21 +35,35 @@ jobs:
           key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: gradle-${{ runner.os }}-
 
-      - name: Get dependencies
-        run: ./gradlew --no-daemon assembleRelease
+      - name: Get dependencies and build
+        run: |
+          ./gradlew --no-daemon assembleRelease bundleRelease
 
-      - name: Extract version from build.gradle
+      - name: Extract version from build.gradle.kts
         id: get_version
         run: |
-          VERSION=$(grep 'versionName' app/build.gradle | head -n 1 | grep -oE '"[^"]+"' | tr -d '"')
+          VERSION=$(grep 'versionName' app/build.gradle.kts | head -n 1 | grep -oE '"[^"]+"' | tr -d '"')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Prepare artifacts
         run: |
           mkdir -p dist
           VERSION=${{ steps.get_version.outputs.version }}
-          cp app/build/outputs/apk/release/app-release.apk dist/SayCheese-${VERSION}.apk
-          cp app/build/outputs/bundle/release/app-release.aab dist/SayCheese-${VERSION}.aab || true
+
+          APK_PATH="app/build/outputs/apk/release/app-release-unsigned.apk"
+          AAB_PATH="app/build/outputs/bundle/release/app-release.aab"
+
+          if [ -f "$APK_PATH" ]; then
+            cp "$APK_PATH" dist/SayCheese-${VERSION}.apk
+          else
+            echo "APK not found at $APK_PATH"
+          fi
+
+          if [ -f "$AAB_PATH" ]; then
+            cp "$AAB_PATH" dist/SayCheese-${VERSION}.aab
+          else
+            echo "AAB not found at $AAB_PATH"
+          fi
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
