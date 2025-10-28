@@ -39,10 +39,10 @@ jobs:
         run: |
           ./gradlew --no-daemon assembleRelease bundleRelease
 
-      - name: Extract version from build.gradle.kts
+      - name: Extract version from Gradle
         id: get_version
         run: |
-          VERSION=$(grep 'versionName' app/build.gradle.kts | head -n 1 | grep -oE '"[^"]+"' | tr -d '"')
+          VERSION=$(./gradlew -q printVersion)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Prepare artifacts
@@ -85,10 +85,10 @@ jobs:
           name: saycheese-build
           path: ./artifacts
 
-      - name: Get version
+      - name: Get version from Gradle
         id: get_version
         run: |
-          VERSION=$(grep 'versionName' app/build.gradle | head -n 1 | grep -oE '"[^"]+"' | tr -d '"')
+          VERSION=$(./gradlew -q printVersion)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Auto-increment version if release exists
@@ -112,6 +112,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION=${{ steps.increment_version.outputs.final_version }}
+          echo "Creating release $VERSION"
 
           gh release create "$VERSION" \
             --title "SayCheese v$VERSION" \
