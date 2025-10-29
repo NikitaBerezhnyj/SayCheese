@@ -127,7 +127,6 @@ jobs:
   release:
     runs-on: ubuntu-latest
     needs: build-android
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -138,10 +137,10 @@ jobs:
           name: saycheese-build
           path: ./artifacts
 
-      - name: Get version from Gradle
+      - name: Get version from artifact
         id: version
         run: |
-          VERSION=$(./gradlew -q printVersion)
+          VERSION=$(cat ./artifacts/version.txt)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Auto-increment version if release exists
@@ -152,12 +151,10 @@ jobs:
           VERSION=${{ steps.version.outputs.version }}
           COUNT=0
           NEW_VERSION=$VERSION
-
           while gh release view "$NEW_VERSION" >/dev/null 2>&1; do
             COUNT=$((COUNT+1))
             NEW_VERSION="${VERSION}-${COUNT}"
           done
-
           echo "final_version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
       - name: Publish GitHub Release
@@ -166,9 +163,7 @@ jobs:
         run: |
           VERSION=${{ steps.increment.outputs.final_version }}
           echo "Creating release v$VERSION"
-
           gh release create "$VERSION" \
             --title "SayCheese v$VERSION" \
             --notes "Automated release build"
-
-          gh release upload "$VERSION" ./artifacts/* --clobber
+          gh release upload "$VERSION" ./artifacts/*.apk ./artifacts/*.aab --clobber
