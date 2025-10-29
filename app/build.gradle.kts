@@ -1,7 +1,17 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+}
+
+val keystorePropertiesFile: File = file("key.properties")
+val keystoreProperties = Properties()
+
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
 android {
@@ -9,7 +19,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.saycheese"
+        applicationId = "com.nikitaberezhnyj.saycheese"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
@@ -22,9 +32,23 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            if (keystorePropertiesFile.exists()) {
+                storeFile = keystoreProperties["storeFile"]?.let { file(it.toString()) }
+                storePassword = keystoreProperties["storePassword"]?.toString()
+                keyAlias = keystoreProperties["keyAlias"]?.toString()
+                keyPassword = keystoreProperties["keyPassword"]?.toString()
+            } else {
+                println("Warning: key.properties file not found. Release signing will fail.")
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -35,6 +59,7 @@ android {
             isMinifyEnabled = false
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -77,5 +102,11 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.5.4")
     implementation("com.alphacephei:vosk-android:0.3.47")
     implementation("net.java.dev.jna:jna:5.13.0@aar")
-    implementation("org.apache.commons:commons-text:1.10.0")
+}
+
+tasks.register("writeVersion") {
+    doLast {
+        val version = android.defaultConfig.versionName
+        file("${project.buildDir}/version.txt").writeText(version.toString())
+    }
 }
