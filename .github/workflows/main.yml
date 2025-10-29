@@ -15,7 +15,6 @@ on:
 jobs:
   build-android:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -45,7 +44,6 @@ jobs:
             ls -la app || true
             exit 1
           fi
-
           if [[ -f app/saycheese-release.jks ]]; then
             echo "keystore found: app/saycheese-release.jks (size: $(stat -c%s app/saycheese-release.jks) bytes)"
           else
@@ -53,38 +51,18 @@ jobs:
             ls -la app || true
             exit 1
           fi
-
           if grep -q '^storeFile=' app/key.properties; then
             echo "key.properties contains storeFile"
           else
             echo "key.properties does not contain storeFile"
             exit 1
           fi
-
           STOREFILE="$(grep '^storeFile=' app/key.properties | cut -d'=' -f2 || true)"
           if [[ -n "$STOREFILE" && -f "app/$STOREFILE" ]]; then
             echo "storeFile references existing file: $STOREFILE"
           else
             echo "storeFile points to missing file: $STOREFILE"
             ls -la app || true
-            exit 1
-          fi
-
-      - name: Verify keystore configuration
-        run: |
-          echo "Checking key.properties structure..."
-          if [[ -f app/key.properties ]]; then
-            echo "✓ key.properties exists"
-            echo "✓ Contains $(wc -l < app/key.properties) lines"
-          else
-            echo "✗ key.properties NOT FOUND"
-            exit 1
-          fi
-
-          if [[ -f app/saycheese-release.jks ]]; then
-            echo "✓ Keystore exists ($(stat -c%s app/saycheese-release.jks) bytes)"
-          else
-            echo "✗ Keystore NOT FOUND"
             exit 1
           fi
 
@@ -97,25 +75,25 @@ jobs:
           ./gradlew -q writeVersion
           VERSION=$(cat app/build/version.txt)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+          mkdir -p dist
+          echo "$VERSION" > dist/version.txt
 
       - name: Prepare artifacts
         run: |
-          mkdir -p dist
           VERSION=${{ steps.version.outputs.version }}
-
           APK_PATH="app/build/outputs/apk/release/app-release.apk"
           AAB_PATH="app/build/outputs/bundle/release/app-release.aab"
-
           if [ -f "$APK_PATH" ]; then
             cp "$APK_PATH" dist/SayCheese-${VERSION}.apk
           else
             echo "APK not found!"
+            exit 1
           fi
-
           if [ -f "$AAB_PATH" ]; then
             cp "$AAB_PATH" dist/SayCheese-${VERSION}.aab
           else
             echo "AAB not found!"
+            exit 1
           fi
 
       - name: Upload build artifacts
