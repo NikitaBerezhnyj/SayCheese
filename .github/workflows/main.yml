@@ -34,6 +34,40 @@ jobs:
           echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> app/key.properties
           echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> app/key.properties
 
+      - name: Verify keystore and key properties
+        run: |
+          if [[ -s app/key.properties ]]; then
+            echo "key.properties exists and is not empty"
+          else
+            echo "key.properties missing or empty"
+            ls -la app || true
+            exit 1
+          fi
+
+          if [[ -f app/saycheese-release.jks ]]; then
+            echo "keystore found: app/saycheese-release.jks (size: $(stat -c%s app/saycheese-release.jks) bytes)"
+          else
+            echo "keystore not found at app/saycheese-release.jks"
+            ls -la app || true
+            exit 1
+          fi
+
+          if grep -q '^storeFile=' app/key.properties; then
+            echo "key.properties contains storeFile"
+          else
+            echo "key.properties does not contain storeFile"
+            exit 1
+          fi
+
+          STOREFILE="$(grep '^storeFile=' app/key.properties | cut -d'=' -f2 || true)"
+          if [[ -n "$STOREFILE" && -f "app/$STOREFILE" ]]; then
+            echo "storeFile references existing file: $STOREFILE"
+          else
+            echo "storeFile points to missing file: $STOREFILE"
+            ls -la app || true
+            exit 1
+          fi
+
       - name: Build signed APK & AAB
         run: ./gradlew --no-daemon clean assembleRelease bundleRelease
 
