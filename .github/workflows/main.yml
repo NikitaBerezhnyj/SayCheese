@@ -26,21 +26,19 @@ jobs:
           distribution: "temurin"
           java-version: 17
 
-      - name: Cache Gradle
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: gradle-${{ runner.os }}-
-
-      - name: Get dependencies and build
+      - name: Decode keystore from secrets
         run: |
-          ./gradlew --no-daemon assembleRelease bundleRelease
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > saycheese-release.jks
+          echo "storeFile=saycheese-release.jks" > key.properties
+          echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" >> key.properties
+          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> key.properties
+          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> key.properties
 
-      - name: Extract version from Gradle
-        id: get_version
+      - name: Build signed APK & AAB
+        run: ./gradlew --no-daemon clean assembleRelease bundleRelease
+
+      - name: Extract version name
+        id: version
         run: |
           VERSION=$(./gradlew -q printVersion)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
@@ -48,24 +46,24 @@ jobs:
       - name: Prepare artifacts
         run: |
           mkdir -p dist
-          VERSION=${{ steps.get_version.outputs.version }}
+          VERSION=${{ steps.version.outputs.version }}
 
-          APK_PATH="app/build/outputs/apk/release/app-release-unsigned.apk"
+          APK_PATH="app/build/outputs/apk/release/app-release.apk"
           AAB_PATH="app/build/outputs/bundle/release/app-release.aab"
 
           if [ -f "$APK_PATH" ]; then
             cp "$APK_PATH" dist/SayCheese-${VERSION}.apk
           else
-            echo "APK not found at $APK_PATH"
+            echo "APK not found!"
           fi
 
           if [ -f "$AAB_PATH" ]; then
             cp "$AAB_PATH" dist/SayCheese-${VERSION}.aab
           else
-            echo "AAB not found at $AAB_PATH"
+            echo "AAB not found!"
           fi
 
-      - name: Upload artifacts
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: saycheese-build
@@ -79,45 +77,43 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Download artifacts
+      - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
           name: saycheese-build
           path: ./artifacts
 
       - name: Get version from Gradle
-        id: get_version
+        id: version
         run: |
           VERSION=$(./gradlew -q printVersion)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Auto-increment version if release exists
-        id: increment_version
+        id: increment
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          VERSION=${{ steps.get_version.outputs.version }}
+          VERSION=${{ steps.version.outputs.version }}
           COUNT=0
           NEW_VERSION=$VERSION
 
           while gh release view "$NEW_VERSION" >/dev/null 2>&1; do
-            echo "Version $NEW_VERSION exists, incrementing..."
             COUNT=$((COUNT+1))
             NEW_VERSION="${VERSION}-${COUNT}"
           done
+
           echo "final_version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
-      - name: Create or update GitHub Release
+      - name: Publish GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          VERSION=${{ steps.increment_version.outputs.final_version }}
-          echo "Creating release $VERSION"
+          VERSION=${{ steps.increment.outputs.final_version }}
+          echo "Creating release v$VERSION"
 
           gh release create "$VERSION" \
             --title "SayCheese v$VERSION" \
-            --notes "Automated release build" || true
+            --notes "Automated release build"
 
-          for file in ./artifacts/*; do
-            gh release upload "$VERSION" "$file" --clobber
-          done
+          gh release upload "$VERSION" ./artifacts/* --clobber
