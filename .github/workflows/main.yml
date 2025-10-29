@@ -94,7 +94,8 @@ jobs:
       - name: Extract version name
         id: version
         run: |
-          VERSION=$(./gradlew -q printVersion)
+          ./gradlew -q writeVersion
+          VERSION=$(cat app/build/version.txt)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Prepare artifacts

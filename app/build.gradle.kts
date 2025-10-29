@@ -104,8 +104,9 @@ dependencies {
     implementation("net.java.dev.jna:jna:5.13.0@aar")
 }
 
-tasks.register("printVersion") {
+tasks.register("writeVersion") {
     doLast {
-        println(android.defaultConfig.versionName)
+        val version = android.defaultConfig.versionName
+        file("${project.buildDir}/version.txt").writeText(version.toString())
     }
 }
