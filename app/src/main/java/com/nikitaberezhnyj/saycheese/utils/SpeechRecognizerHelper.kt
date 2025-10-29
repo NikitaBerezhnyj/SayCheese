@@ -13,6 +13,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.net.URL
 import java.util.zip.ZipInputStream
+import org.apache.commons.text.similarity.LevenshteinDistance
 
 class SpeechRecognizerHelper(
     private val context: Context
@@ -30,6 +31,8 @@ class SpeechRecognizerHelper(
         "https://github.com/NikitaBerezhnyj/SayCheese/raw/main/assets/vosk-model-small-en-us-0.15.zip"
 
     private val sampleRate = 16000
+    private val cheeseThreshold = 2
+    private val timerThreshold = 2
     private val channelConfig = AudioFormat.CHANNEL_IN_MONO
     private val audioFormat = AudioFormat.ENCODING_PCM_16BIT
     private val bufferSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat)
@@ -88,6 +91,11 @@ class SpeechRecognizerHelper(
             Log.e("SpeechRecognizer", "Failed to load model", e)
             throw e
         }
+    }
+
+    private fun isFuzzyMatch(word: String, target: String, threshold: Int): Boolean {
+        val distance = LevenshteinDistance().apply(word.lowercase(), target.lowercase())
+        return distance <= threshold
     }
 
     fun startListening(
@@ -187,11 +195,14 @@ class SpeechRecognizerHelper(
     private fun processResult(text: String, onCheeseHeard: () -> Unit, onTimerHeard: () -> Unit) {
         val lower = text.lowercase()
 
-        if (lower.contains("cheese")) {
-            onCheeseHeard()
-        }
-        if (lower.contains("time") || lower.contains("timer")) {
-            onTimerHeard()
+        val words = lower.split(Regex("\\W+"))
+
+        for (word in words) {
+            if (isFuzzyMatch(word, "cheese", cheeseThreshold)) {
+                onCheeseHeard()
+            } else if (isFuzzyMatch(word, "time", timerThreshold) || isFuzzyMatch(word, "timer", timerThreshold)) {
+                onTimerHeard()
+            }
         }
     }
 
