@@ -13,3 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+saycheese-release.jks
+key.properties
+keystore.txt
+.vscode
