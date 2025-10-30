@@ -19,6 +19,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.nikitaberezhnyj.saycheese.R
+import com.nikitaberezhnyj.saycheese.ui.theme.BackgroundDark
+import com.nikitaberezhnyj.saycheese.ui.theme.TextPrimary
 
 @Composable
 fun BottomBar(
@@ -35,7 +37,7 @@ fun BottomBar(
         modifier = Modifier
             .fillMaxWidth()
             .height(124.dp)
-            .background(Color.Black)
+            .background(BackgroundDark)
             .padding(horizontal = 16.dp, vertical = 16.dp),
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
@@ -55,7 +57,7 @@ fun BottomBar(
             Icon(
                 imageVector = Icons.Filled.Timer,
                 contentDescription = stringResource(R.string.desc_take_photo_with_timer),
-                tint = Color.White,
+                tint = TextPrimary,
                 modifier = Modifier.size(28.dp)
             )
         }
@@ -74,12 +76,12 @@ fun BottomBar(
             modifier = Modifier
                 .size(64.dp)
                 .clip(CircleShape)
-                .background(Color.White)
+                .background(TextPrimary)
         ) {
             Icon(
                 imageVector = Icons.Filled.CameraEnhance,
                 contentDescription = stringResource(R.string.desc_take_photo),
-                tint = Color.Black,
+                tint = BackgroundDark,
                 modifier = Modifier.size(32.dp)
             )
         }
@@ -91,7 +93,7 @@ fun BottomBar(
             Icon(
                 imageVector = Icons.Filled.ChangeCircle,
                 contentDescription = stringResource(R.string.desc_switch_camera),
-                tint = Color.White,
+                tint = TextPrimary,
                 modifier = Modifier.size(36.dp)
             )
         }

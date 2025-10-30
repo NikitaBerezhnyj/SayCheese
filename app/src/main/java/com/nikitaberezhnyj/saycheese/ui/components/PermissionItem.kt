@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.material3.Text
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.nikitaberezhnyj.saycheese.ui.theme.TextPrimary
 
 @Composable
 fun PermissionItem(
@@ -26,7 +27,7 @@ fun PermissionItem(
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                color = Color.White.copy(alpha = 0.1f),
+                color = TextPrimary.copy(alpha = 0.1f),
                 shape = RoundedCornerShape(16.dp)
             )
             .padding(16.dp),
@@ -36,13 +37,13 @@ fun PermissionItem(
             modifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)
-                .background(Color.White.copy(alpha = 0.2f)),
+                .background(TextPrimary.copy(alpha = 0.2f)),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = Color.White,
+                tint = TextPrimary,
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -54,13 +55,13 @@ fun PermissionItem(
                 text = title,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = Color.White
+                color = TextPrimary
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = description,
                 fontSize = 14.sp,
-                color = Color.White.copy(alpha = 0.7f),
+                color = TextPrimary.copy(alpha = 0.7f),
                 lineHeight = 20.sp
             )
         }

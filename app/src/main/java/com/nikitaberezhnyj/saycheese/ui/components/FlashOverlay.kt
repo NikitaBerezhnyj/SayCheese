@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.nikitaberezhnyj.saycheese.ui.theme.TextPrimary
 import kotlinx.coroutines.delay
 
 @Composable
@@ -23,6 +24,6 @@ fun FlashOverlay(onAnimationEnd: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White.copy(alpha = alpha.value))
+            .background(TextPrimary.copy(alpha = alpha.value))
     )
 }

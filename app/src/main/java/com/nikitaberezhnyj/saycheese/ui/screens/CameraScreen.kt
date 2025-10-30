@@ -28,6 +28,8 @@ import kotlinx.coroutines.launch
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
+import com.nikitaberezhnyj.saycheese.ui.theme.BackgroundDark
+import com.nikitaberezhnyj.saycheese.ui.theme.TextPrimary
 
 enum class SpeechStatusKey {
     INIT, LOADING, READY, ERROR_INIT, LISTENING, PAUSED, STOPPED, INACTIVE
@@ -140,7 +142,7 @@ fun CameraScreen() {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(
                 text = stringResource(R.string.permission_required),
-                color = Color.White
+                color = TextPrimary
             )
         }
         return
@@ -191,7 +193,7 @@ fun CameraScreen() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black)
+                .background(BackgroundDark)
                 .padding(
                     top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
                     bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()

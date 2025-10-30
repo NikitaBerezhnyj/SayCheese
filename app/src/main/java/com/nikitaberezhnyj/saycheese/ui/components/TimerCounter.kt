@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.nikitaberezhnyj.saycheese.ui.theme.TextPrimary
 import kotlinx.coroutines.delay
 
 @Composable
@@ -36,7 +37,7 @@ fun TimerCounter(
     ) {
         Text(
             text = secondsLeft.toString(),
-            color = Color.White,
+            color = TextPrimary,
             fontSize = 64.sp,
             fontWeight = FontWeight.Bold
         )

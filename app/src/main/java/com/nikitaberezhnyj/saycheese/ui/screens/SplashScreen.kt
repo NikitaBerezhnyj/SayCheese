@@ -20,6 +20,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nikitaberezhnyj.saycheese.R
+import com.nikitaberezhnyj.saycheese.ui.theme.BackgroundDark
+import com.nikitaberezhnyj.saycheese.ui.theme.TextPrimary
 
 @Composable
 fun SplashScreenContent() {
@@ -47,7 +49,7 @@ fun SplashScreenContent() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black),
+            .background(BackgroundDark),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -60,13 +62,13 @@ fun SplashScreenContent() {
                     .size(200.dp)
                     .scale(scale)
                     .clip(RoundedCornerShape(24.dp))
-                    .background(Color.White)
+                    .background(TextPrimary)
             ) {
                 Box(
                     modifier = Modifier
                         .size(195.dp)
                         .clip(RoundedCornerShape(20.dp))
-                        .background(Color.Black)
+                        .background(BackgroundDark)
                         .padding(8.dp)
                 ) {
                     Image(
@@ -83,7 +85,7 @@ fun SplashScreenContent() {
                 text = stringResource(R.string.app_name),
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = TextPrimary,
                 modifier = Modifier.alpha(alpha)
             )
         }

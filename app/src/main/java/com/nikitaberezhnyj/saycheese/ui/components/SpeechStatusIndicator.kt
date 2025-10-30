@@ -17,6 +17,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.nikitaberezhnyj.saycheese.R
 import com.nikitaberezhnyj.saycheese.ui.screens.SpeechStatusKey
+import com.nikitaberezhnyj.saycheese.ui.theme.BackgroundDark
+import com.nikitaberezhnyj.saycheese.ui.theme.DangerText
+import com.nikitaberezhnyj.saycheese.ui.theme.InfoText
+import com.nikitaberezhnyj.saycheese.ui.theme.TextPrimary
 
 @Composable
 fun SpeechStatusIndicator(
@@ -43,11 +47,11 @@ fun SpeechStatusIndicator(
     }
 
     val iconColor = when (statusKey) {
-        SpeechStatusKey.ERROR_INIT -> Color(0xFFFF4444)
+        SpeechStatusKey.ERROR_INIT -> DangerText
         SpeechStatusKey.INACTIVE,
         SpeechStatusKey.PAUSED,
-        SpeechStatusKey.STOPPED -> Color(0xFFBBBBBB)
-        else -> Color.White
+        SpeechStatusKey.STOPPED -> InfoText
+        else -> TextPrimary
     }
 
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
@@ -67,7 +71,7 @@ fun SpeechStatusIndicator(
         modifier = modifier
             .size(48.dp)
             .background(
-                color = Color.Black.copy(alpha = 0.7f),
+                color = BackgroundDark.copy(alpha = 0.7f),
                 shape = RoundedCornerShape(8.dp)
             )
             .padding(8.dp),

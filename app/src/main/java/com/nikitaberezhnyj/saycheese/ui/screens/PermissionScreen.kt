@@ -25,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nikitaberezhnyj.saycheese.R
 import com.nikitaberezhnyj.saycheese.ui.components.PermissionItem
+import com.nikitaberezhnyj.saycheese.ui.theme.BackgroundDark
+import com.nikitaberezhnyj.saycheese.ui.theme.TextPrimary
 import com.nikitaberezhnyj.saycheese.utils.Constants
 import com.nikitaberezhnyj.saycheese.utils.PermissionUtils
 
@@ -57,7 +59,7 @@ fun PermissionScreen(onPermissionsGranted: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black),
+            .background(BackgroundDark),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -81,7 +83,7 @@ fun PermissionScreen(onPermissionsGranted: () -> Unit) {
                 text = stringResource(R.string.permission_title),
                 fontSize = 24.sp,
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
-                color = Color.White,
+                color = TextPrimary,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
             )
 
@@ -90,7 +92,7 @@ fun PermissionScreen(onPermissionsGranted: () -> Unit) {
             Text(
                 text = stringResource(R.string.permission_description),
                 fontSize = 14.sp,
-                color = Color.White.copy(alpha = 0.7f),
+                color = TextPrimary.copy(alpha = 0.7f),
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                 lineHeight = 20.sp
             )
@@ -130,8 +132,8 @@ fun PermissionScreen(onPermissionsGranted: () -> Unit) {
                     .height(50.dp)
                     .scale(buttonScale),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
-                    contentColor = Color.Black
+                    containerColor = TextPrimary,
+                    contentColor = BackgroundDark
                 ),
                 shape = RoundedCornerShape(25.dp)
             ) {

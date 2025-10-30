@@ -10,6 +10,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.nikitaberezhnyj.saycheese.ui.theme.BackgroundDark
+import com.nikitaberezhnyj.saycheese.ui.theme.TextPrimary
 
 @Composable
 fun TopBar(
@@ -21,7 +23,7 @@ fun TopBar(
         modifier = Modifier
             .fillMaxWidth()
             .height(48.dp)
-            .background(Color.Black)
+            .background(BackgroundDark)
             .padding(horizontal = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -33,7 +35,7 @@ fun TopBar(
             Icon(
                 imageVector = if (flashEnabled) Icons.Filled.FlashOn else Icons.Filled.FlashOff,
                 contentDescription = "Flash",
-                tint = Color.White,
+                tint = TextPrimary,
                 modifier = Modifier.size(28.dp)
             )
         }
@@ -45,7 +47,7 @@ fun TopBar(
             Icon(
                 imageVector = Icons.Default.Settings,
                 contentDescription = "Settings",
-                tint = Color.White,
+                tint = TextPrimary,
                 modifier = Modifier.size(28.dp)
             )
         }
