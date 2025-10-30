@@ -18,6 +18,12 @@
     <string name="permission_required">Allow access to the camera and microphone</string>
     <string name="permission_required_self">Please grant permissions via your device settings</string>
 
+    <!-- No internet dialog for speech model -->
+    <string name="no_internet_title">No Internet</string>
+    <string name="no_internet_text">Failed to download the speech recognition model. You can try again or continue without voice commands. If you get an internet connection later, you can enable this feature in the settings.</string>
+    <string name="no_internet_confirm">Retry</string>
+    <string name="no_internet_dismiss">Without Voice</string>
+
     <!-- Speech recognition statuses -->
     <string name="speech_init">Preparing...</string>
     <string name="speech_loading_model">Loading...</string>

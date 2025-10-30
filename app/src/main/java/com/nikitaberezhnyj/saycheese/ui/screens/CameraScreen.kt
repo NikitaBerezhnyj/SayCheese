@@ -22,8 +22,12 @@ import com.nikitaberezhnyj.saycheese.ui.components.*
 import com.nikitaberezhnyj.saycheese.utils.PermissionUtils
 import com.nikitaberezhnyj.saycheese.utils.SpeechRecognizerHelper
 import com.nikitaberezhnyj.saycheese.utils.takePhoto
+import com.nikitaberezhnyj.saycheese.utils.NetworkUtils
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 
 enum class SpeechStatusKey {
     INIT, LOADING, READY, ERROR_INIT, LISTENING, PAUSED, STOPPED, INACTIVE
@@ -35,6 +39,7 @@ fun CameraScreen() {
     val lifecycleOwner = LocalLifecycleOwner.current
     val coroutineScope = rememberCoroutineScope()
     val settingsManager = remember { CameraSettingsManager(context) }
+    var showNoInternetDialog by remember { mutableStateOf(false) }
 
     val (savedLensFacing, savedFlashEnabled, savedGridEnabled, savedTimeSecond, savedSpeechRecognitionEnabled) =
         settingsManager.loadCameraSettings()
@@ -76,17 +81,22 @@ fun CameraScreen() {
         }
     }
 
-    LaunchedEffect(hasPermissions) {
-        if (hasPermissions) {
-            speechStatusKey = SpeechStatusKey.LOADING
-            try {
-                speechHelper.initModel()
-                speechModelInitialized = true
-                speechStatusKey = SpeechStatusKey.READY
-            } catch (e: Exception) {
-                Log.e("SpeechRecognition", "Speech model initialization failed", e)
-                speechModelInitialized = false
-                speechStatusKey = SpeechStatusKey.ERROR_INIT
+    LaunchedEffect(hasPermissions, speechRecognitionEnabled) {
+        if (hasPermissions && speechRecognitionEnabled) {
+            if (NetworkUtils.hasInternetConnection(context)) {
+                speechStatusKey = SpeechStatusKey.LOADING
+                try {
+                    speechHelper.initModel()
+                    speechModelInitialized = true
+                    speechStatusKey = SpeechStatusKey.READY
+                } catch (e: Exception) {
+                    Log.e("SpeechRecognition", "Speech model initialization failed", e)
+                    speechModelInitialized = false
+                    speechStatusKey = SpeechStatusKey.ERROR_INIT
+                }
+                showNoInternetDialog = false
+            } else {
+                showNoInternetDialog = true
             }
         }
     }
@@ -134,6 +144,47 @@ fun CameraScreen() {
             )
         }
         return
+    }
+
+    if (showNoInternetDialog) {
+        AlertDialog(
+            onDismissRequest = { showNoInternetDialog = false },
+            title = { Text(stringResource(R.string.no_internet_title)) },
+            text = { Text(stringResource(R.string.no_internet_text)) },
+            confirmButton = {
+                Button(onClick = {
+                    if (NetworkUtils.hasInternetConnection(context)) {
+                        showNoInternetDialog = false
+                        coroutineScope.launch {
+                            speechStatusKey = SpeechStatusKey.LOADING
+                            try {
+                                speechHelper.initModel()
+                                speechModelInitialized = true
+                                speechStatusKey = SpeechStatusKey.READY
+                            } catch (e: Exception) {
+                                Log.e("SpeechRecognition", "Speech model initialization failed", e)
+                                speechModelInitialized = false
+                                speechStatusKey = SpeechStatusKey.ERROR_INIT
+                            }
+                        }
+                    }
+                }) {
+                    Text(stringResource(R.string.no_internet_confirm))
+                }
+            },
+            dismissButton = {
+                Button(onClick = {
+                    showNoInternetDialog = false
+                    speechRecognitionEnabled = false
+                    settingsManager.saveCameraSettings(
+                        lensFacing, flashEnabled, gridEnabled, timerSeconds, false
+                    )
+                    speechStatusKey = SpeechStatusKey.INACTIVE
+                }) {
+                    Text(stringResource(R.string.no_internet_dismiss))
+                }
+            }
+        )
     }
 
     Box(modifier = Modifier.fillMaxSize()) {

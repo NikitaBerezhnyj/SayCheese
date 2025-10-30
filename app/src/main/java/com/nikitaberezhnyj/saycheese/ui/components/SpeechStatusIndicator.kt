@@ -27,17 +27,17 @@ fun SpeechStatusIndicator(
         SpeechStatusKey.INIT ->
             Icons.Default.HourglassEmpty to stringResource(R.string.speech_init)
         SpeechStatusKey.LOADING ->
-            Icons.Default.Refresh to stringResource(R.string.speech_loading_model)
+            Icons.Default.CloudDownload to stringResource(R.string.speech_loading_model)
         SpeechStatusKey.READY ->
-            Icons.Default.CheckCircle to stringResource(R.string.speech_ready)
+            Icons.Default.TaskAlt to stringResource(R.string.speech_ready)
         SpeechStatusKey.ERROR_INIT ->
-            Icons.Default.Error to stringResource(R.string.speech_error_init)
+            Icons.Default.ReportProblem to stringResource(R.string.speech_error_init)
         SpeechStatusKey.LISTENING ->
-            Icons.Default.Mic to stringResource(R.string.speech_listening)
+            Icons.Default.GraphicEq to stringResource(R.string.speech_listening)
         SpeechStatusKey.PAUSED ->
-            Icons.Default.Pause to stringResource(R.string.speech_paused)
+            Icons.Default.PauseCircle to stringResource(R.string.speech_paused)
         SpeechStatusKey.STOPPED ->
-            Icons.Default.Stop to stringResource(R.string.speech_stopped)
+            Icons.Default.StopCircle to stringResource(R.string.speech_stopped)
         SpeechStatusKey.INACTIVE ->
             Icons.Default.MicOff to stringResource(R.string.speech_inactive, "")
     }

@@ -18,6 +18,12 @@
     <string name="permission_required">Дозвольте доступ до камери й мікрофона</string>
     <string name="permission_required_self">Будь ласка, надайте дозволи через налаштування пристрою</string>
 
+    <!-- No internet dialog for speech model -->
+    <string name="no_internet_title">Немає Інтернету</string>
+    <string name="no_internet_text">Не вдалося завантажити модель розпізнавання мови. Ви можете повторити спробу або працювати без голосових команд. Якщо пізніше з’явиться інтернет, ви зможете увімкнути цю функцію в налаштуваннях.</string>
+    <string name="no_internet_confirm">Повторити</string>
+    <string name="no_internet_dismiss">Без голосу</string>
+
     <!-- Speech recognition statuses -->
     <string name="speech_init">Підготовка...</string>
     <string name="speech_loading_model">Завантаження...</string>
