@@ -2,6 +2,7 @@ package com.nikitaberezhnyj.saycheese.utils
 
 import android.content.ContentValues
 import android.content.Context
+import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
@@ -13,7 +14,7 @@ import com.nikitaberezhnyj.saycheese.R
 fun takePhoto(
     context: Context,
     imageCapture: ImageCapture,
-    onPhotoSaved: () -> Unit
+    onPhotoSaved: (Uri?) -> Unit
 ) {
     val contentValues = ContentValues().apply {
         put(MediaStore.MediaColumns.DISPLAY_NAME, "photo_${System.currentTimeMillis()}.jpg")
@@ -41,24 +42,18 @@ fun takePhoto(
                     else -> context.getString(R.string.photo_error_generic)
                 }
 
-                Log.e("CameraX", "Photo save failed: $errorMessage (Error code: ${exc.imageCaptureError})", exc)
+                Log.e("CameraX", "Photo save failed: $errorMessage (code ${exc.imageCaptureError})", exc)
 
                 Toast.makeText(
                     context,
-                    "Failed to save photo: $errorMessage",
+                    context.getString(R.string.photo_error_save, errorMessage),
                     Toast.LENGTH_LONG
                 ).show()
             }
 
             override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                Log.i("CameraX", "Photo successfully saved at: ${output.savedUri}")
-
-                Toast.makeText(
-                    context,
-                    "Photo successfully saved",
-                    Toast.LENGTH_LONG
-                ).show()
-                onPhotoSaved()
+                Log.i("CameraX", "Photo saved: ${output.savedUri}")
+                onPhotoSaved(output.savedUri)
             }
         }
     )
