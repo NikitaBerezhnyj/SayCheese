@@ -3,25 +3,26 @@ package com.nikitaberezhnyj.saycheese
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.*
-import com.nikitaberezhnyj.saycheese.ui.screens.CameraScreen
-import com.nikitaberezhnyj.saycheese.ui.screens.PermissionScreen
-import com.nikitaberezhnyj.saycheese.ui.screens.SplashScreenContent
-import com.nikitaberezhnyj.saycheese.ui.theme.SayCheeseTheme
-import com.nikitaberezhnyj.saycheese.utils.Constants
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.nikitaberezhnyj.saycheese.screens.CameraScreen
+import com.nikitaberezhnyj.saycheese.screens.PermissionScreen
+import com.nikitaberezhnyj.saycheese.theme.SayCheeseTheme
+import com.nikitaberezhnyj.saycheese.models.SpeechStatusKey
+import com.nikitaberezhnyj.saycheese.screens.ErrorScreen
+import com.nikitaberezhnyj.saycheese.screens.LoadingScreen
+import com.nikitaberezhnyj.saycheese.screens.SettingsScreen
 import com.nikitaberezhnyj.saycheese.utils.LocaleUtils
 import com.nikitaberezhnyj.saycheese.utils.PermissionUtils
-import kotlinx.coroutines.delay
+import com.nikitaberezhnyj.saycheese.viewmodels.CameraViewModel
 import java.util.Locale
 
 class MainActivity : ComponentActivity() {
-    private lateinit var requestPermissionLauncher: ActivityResultLauncher<Array<String>>
-
     override fun attachBaseContext(newBase: Context) {
         val prefs = newBase.getSharedPreferences("app_settings", Context.MODE_PRIVATE)
         val supportedLanguages = listOf("en", "uk")
@@ -35,35 +36,53 @@ class MainActivity : ComponentActivity() {
             else -> "en"
         }
 
-        val context = LocaleUtils.setLocale(newBase, lang)
-        super.attachBaseContext(context)
+        super.attachBaseContext(
+            LocaleUtils.setLocale(newBase, LocaleUtils.resolveLanguage(newBase))
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+        )
 
         setContent {
             SayCheeseTheme {
-                var showSplash by remember { mutableStateOf(true) }
-                var permissionsGranted by remember { mutableStateOf(PermissionUtils.allPermissionsGranted(this)) }
+                val viewModel: CameraViewModel = viewModel()
+                val uiState by viewModel.uiState.collectAsState()
 
-                requestPermissionLauncher =
-                    rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { results ->
-                        permissionsGranted = PermissionUtils.allPermissionsGranted(this)
-                    }
-
-                LaunchedEffect(Unit) {
-                    delay(1500)
-                    showSplash = false
+                var permissionsGranted by remember {
+                    mutableStateOf(PermissionUtils.allPermissionsGranted(this))
+                }
+                val refreshPermissions = {
+                    permissionsGranted = PermissionUtils.allPermissionsGranted(this)
                 }
 
+                LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { refreshPermissions() }
+
+                LaunchedEffect(permissionsGranted, uiState.speechRecognitionEnabled) {
+                    viewModel.initializeSpeechModel(permissionsGranted)
+                }
+
+                val speechNotReady =
+                    uiState.speechRecognitionEnabled && !uiState.speechModelInitialized
+
                 when {
-                    showSplash -> SplashScreenContent()
-                    permissionsGranted -> CameraScreen()
-                    else -> PermissionScreen {
-                        requestPermissionLauncher.launch(Constants.REQUIRED_PERMISSIONS)
-                    }
+                    !permissionsGranted -> PermissionScreen(onResult = refreshPermissions)
+
+                    speechNotReady && uiState.speechStatusKey == SpeechStatusKey.ERROR_INIT ->
+                        ErrorScreen(
+                            onRetry = { viewModel.initializeSpeechModel(true) },
+                            onContinueWithoutVoice = { viewModel.setSpeechRecognitionEnabled(false) }
+                        )
+
+                    speechNotReady -> LoadingScreen()
+
+                    uiState.settingsVisible -> SettingsScreen()
+
+                    else -> CameraScreen()
                 }
             }
         }

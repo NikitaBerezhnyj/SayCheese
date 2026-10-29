@@ -1,9 +1,12 @@
-package com.nikitaberezhnyj.saycheese.ui.components
+@file:Suppress("FunctionName")
+
+package com.nikitaberezhnyj.saycheese.components
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 
 @Composable
@@ -18,8 +21,8 @@ fun GridOverlay() {
             for (i in 1..2) {
                 drawLine(
                     color = Color.White.copy(alpha = 0.6f),
-                    start = androidx.compose.ui.geometry.Offset(x = thirdWidth * i, y = 0f),
-                    end = androidx.compose.ui.geometry.Offset(x = thirdWidth * i, y = height),
+                    start = Offset(x = thirdWidth * i, y = 0f),
+                    end = Offset(x = thirdWidth * i, y = height),
                     strokeWidth = 2f
                 )
             }
@@ -27,8 +30,8 @@ fun GridOverlay() {
             for (i in 1..2) {
                 drawLine(
                     color = Color.White.copy(alpha = 0.6f),
-                    start = androidx.compose.ui.geometry.Offset(x = 0f, y = thirdHeight * i),
-                    end = androidx.compose.ui.geometry.Offset(x = width, y = thirdHeight * i),
+                    start = Offset(x = 0f, y = thirdHeight * i),
+                    end = Offset(x = width, y = thirdHeight * i),
                     strokeWidth = 2f
                 )
             }
