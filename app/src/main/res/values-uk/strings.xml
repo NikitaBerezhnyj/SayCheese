@@ -15,24 +15,20 @@
 
     <!-- Permissions -->
     <string name="grant_permissions">Надати дозволи</string>
-    <string name="permission_required">Дозвольте доступ до камери й мікрофона</string>
-    <string name="permission_required_self">Будь ласка, надайте дозволи через налаштування пристрою</string>
 
-    <!-- No internet dialog for speech model -->
-    <string name="no_internet_title">Немає Інтернету</string>
-    <string name="no_internet_text">Не вдалося завантажити модель розпізнавання мови. Ви можете повторити спробу або працювати без голосових команд. Якщо пізніше з’явиться інтернет, ви зможете увімкнути цю функцію в налаштуваннях.</string>
-    <string name="no_internet_confirm">Повторити</string>
-    <string name="no_internet_dismiss">Без голосу</string>
+    <!-- Voice Recognition -->
+    <string name="loading_voice">Готуємо розпізнавання голосу…</string>
+    <string name="error_voice_title">Не вдалося запустити розпізнавання голосу</string>
+    <string name="error_voice_message">Можна спробувати ще раз або користуватися камерою без голосових команд.</string>
+    <string name="error_retry">Спробувати ще</string>
+    <string name="error_continue_without_voice">Продовжити без голосу</string>
+    <string name="permission_blocked">Дозволи заблоковано. Увімкніть їх у налаштуваннях застосунку.</string>
+    <string name="permission_open_settings">Відкрити налаштування</string>
 
     <!-- Speech recognition statuses -->
-    <string name="speech_init">Підготовка...</string>
-    <string name="speech_loading_model">Завантаження...</string>
-    <string name="speech_ready">Готово до роботи</string>
-    <string name="speech_error_init">Не вдалося запустити розпізнавання</string>
-    <string name="speech_listening">Слухаю...</string>
-    <string name="speech_paused">Призупинено</string>
-    <string name="speech_stopped">Зупинено</string>
-    <string name="speech_inactive">Розпізнавання вимкнено: %1$s</string>
+    <string name="speech_hint_title">Скажи «cheese»</string>
+    <string name="speech_hint_subtitle">або «timer» — фото з таймером</string>
+    <string name="speech_unavailable">Голосові команди недоступні</string>
 
     <!-- Reasons why speech is inactive -->
     <string name="reason_disabled">вимкнено</string>
@@ -50,6 +46,12 @@
     <string name="photo_saved">Фото збережено</string>
     <string name="photo_save_error">Не вдалося зберегти: %1$s</string>
 
+    <!-- ... -->
+    <string name="photo_error_save">Не вдалося зберегти фото: %1$s</string>
+    <string name="desc_last_photo">Останнє фото</string>
+    <string name="desc_flash">Спалах</string>
+    <string name="desc_settings">Налаштування</string>
+
     <!-- Camera state -->
     <string name="camera_not_ready">Камера не готова. Спробуйте ще раз.</string>
 
@@ -57,12 +59,13 @@
     <string name="settings_title">Налаштування</string>
     <string name="settings_show_grid">Сітка на екрані</string>
     <string name="settings_listening">Голосові команди</string>
-    <string name="settings_timer_label">Таймер, с:</string>
-    <string name="settings_timer_error">Введіть число 0 або більше</string>
+    <string name="settings_timer_label">Таймер</string>
+    <string name="settings_timer_off">Вимкнено</string>
+    <string name="settings_timer_seconds">%d с</string>
     <string name="settings_language">Мова</string>
     <string name="settings_language_ukrainian">Українська</string>
     <string name="settings_language_english">English</string>
-    <string name="settings_close">Готово</string>
+    <string name="desc_back">Назад</string>
 
     <!-- Accessibility / descriptions -->
     <string name="desc_take_photo">Фото</string>

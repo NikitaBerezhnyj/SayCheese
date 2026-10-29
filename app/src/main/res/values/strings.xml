@@ -15,24 +15,20 @@
 
     <!-- Permissions -->
     <string name="grant_permissions">Grant Permissions</string>
-    <string name="permission_required">Allow access to the camera and microphone</string>
-    <string name="permission_required_self">Please grant permissions via your device settings</string>
 
-    <!-- No internet dialog for speech model -->
-    <string name="no_internet_title">No Internet</string>
-    <string name="no_internet_text">Failed to download the speech recognition model. You can try again or continue without voice commands. If you get an internet connection later, you can enable this feature in the settings.</string>
-    <string name="no_internet_confirm">Retry</string>
-    <string name="no_internet_dismiss">Without Voice</string>
+    <!-- Voice Recognition -->
+    <string name="loading_voice">Preparing voice recognition…</string>
+    <string name="error_voice_title">Voice recognition failed to start</string>
+    <string name="error_voice_message">You can try again or use the camera without voice commands.</string>
+    <string name="error_retry">Try again</string>
+    <string name="error_continue_without_voice">Continue without voice</string>
+    <string name="permission_blocked">Permissions are blocked. Enable them in the app settings.</string>
+    <string name="permission_open_settings">Open settings</string>
 
     <!-- Speech recognition statuses -->
-    <string name="speech_init">Preparing...</string>
-    <string name="speech_loading_model">Loading...</string>
-    <string name="speech_ready">Ready</string>
-    <string name="speech_error_init">Failed to start recognition</string>
-    <string name="speech_listening">Listening...</string>
-    <string name="speech_paused">Paused</string>
-    <string name="speech_stopped">Stopped</string>
-    <string name="speech_inactive">Recognition disabled: %1$s</string>
+    <string name="speech_hint_title">Say “cheese”</string>
+    <string name="speech_hint_subtitle">or “timer” for a countdown</string>
+    <string name="speech_unavailable">Voice commands unavailable</string>
 
     <!-- Reasons why speech is inactive -->
     <string name="reason_disabled">disabled</string>
@@ -50,6 +46,12 @@
     <string name="photo_saved">Photo saved</string>
     <string name="photo_save_error">Failed to save: %1$s</string>
 
+    <!-- ... -->
+    <string name="photo_error_save">Failed to save photo: %1$s</string>
+    <string name="desc_last_photo">Last photo</string>
+    <string name="desc_flash">Flash</string>
+    <string name="desc_settings">Settings</string>
+
     <!-- Camera state -->
     <string name="camera_not_ready">Camera not ready. Please try again.</string>
 
@@ -57,12 +59,13 @@
     <string name="settings_title">Settings</string>
     <string name="settings_show_grid">Show grid</string>
     <string name="settings_listening">Voice commands</string>
-    <string name="settings_timer_label">Timer, s:</string>
-    <string name="settings_timer_error">Enter a number 0 or greater</string>
+    <string name="settings_timer_label">Timer</string>
+    <string name="settings_timer_off">Off</string>
+    <string name="settings_timer_seconds">%d s</string>
     <string name="settings_language">Language</string>
     <string name="settings_language_ukrainian">Українська</string>
     <string name="settings_language_english">English</string>
-    <string name="settings_close">Done</string>
+    <string name="desc_back">Back</string>
 
     <!-- Accessibility / descriptions -->
     <string name="desc_take_photo">Take photo</string>
