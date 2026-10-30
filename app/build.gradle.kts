@@ -109,3 +109,23 @@ tasks.register("writeVersion") {
         file("${project.buildDir}/version.txt").writeText(version.toString())
     }
 }
+
+tasks.register("runDebug") {
+    group = "application"
+    description = "Builds, installs and launches the debug app on a connected Android device."
+
+    dependsOn("installDebug")
+
+    doLast {
+        exec {
+            commandLine(
+                "adb",
+                "shell",
+                "monkey",
+                "-p",
+                android.defaultConfig.applicationId,
+                "1"
+            )
+        }
+    }
+}

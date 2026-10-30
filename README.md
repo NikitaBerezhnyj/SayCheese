@@ -43,14 +43,38 @@ To get started with **SayCheese**, follow these steps:
    cd SayCheese
    ```
 
-2. **Open the project**
-   Open the project in **Android Studio** (recommended latest stable version).
+2. **Prepare your environment**
 
-3. **Sync Gradle**
-   Wait for Gradle synchronization to complete or click **Sync Project with Gradle Files**.
+   Make sure you have the following installed:
+   - JDK 17
+   - Android SDK
+   - Android SDK Platform Tools (`adb`)
 
-4. **Run on device**
-   Connect an Android device or start an emulator, then click **Run**.
+   Ensure that `adb` is available in your system `PATH`.
+
+3. **Connect an Android device**
+
+   Connect your Android device via USB and enable USB debugging in Developer Options.
+
+   Verify that your device is detected:
+
+   ```bash
+   adb devices
+   ```
+
+4. **Build, install and run**
+
+   Run the following command from the project root:
+
+   ```bash
+   ./gradlew :app:runDebug
+   ```
+
+   This custom Gradle task automatically builds the debug version, installs it on the connected device, and launches the application.
+
+   No manual APK installation or Android Studio launch is required.
+
+   **Windows:** Use `gradlew.bat` instead of `./gradlew` when running commands from Command Prompt or PowerShell.
 
 ## Usage
 
@@ -68,3 +92,7 @@ Once the project is running, you can:
 - [Code of Conduct](CODE_OF_CONDUCT.md) — expected behavior for contributors
 - [Contributing Guide](CONTRIBUTING.md) — how to help the project
 - [Security Policy](SECURITY.md) — reporting security issues
+
+## Feedback
+
+If you have suggestions or find bugs, please create an [issue](https://github.com/NikitaBerezhnyj/SayCheese/issues) on GitHub.
