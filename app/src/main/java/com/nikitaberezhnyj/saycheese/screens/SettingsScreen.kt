@@ -1,3 +1,5 @@
+@file:Suppress("FunctionName")
+
 package com.nikitaberezhnyj.saycheese.screens
 
 import android.app.Activity
@@ -22,6 +24,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nikitaberezhnyj.saycheese.R
 import com.nikitaberezhnyj.saycheese.components.SettingsOptionGroup
 import com.nikitaberezhnyj.saycheese.components.SettingsSwitchRow
+import com.nikitaberezhnyj.saycheese.models.PhotoFormat
 import com.nikitaberezhnyj.saycheese.theme.BackgroundDark
 import com.nikitaberezhnyj.saycheese.theme.IconSize
 import com.nikitaberezhnyj.saycheese.theme.Spacing
@@ -119,6 +122,13 @@ fun SettingsScreen(
                         (context as Activity).recreate()
                     }
                 }
+            )
+
+            SettingsOptionGroup(
+                title = stringResource(R.string.settings_photo_format),
+                options = PhotoFormat.entries.map { it to stringResource(it.labelRes) },
+                selected = uiState.photoFormat,
+                onSelect = viewModel::setPhotoFormat
             )
         }
     }

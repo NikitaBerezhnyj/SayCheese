@@ -3,6 +3,7 @@ package com.nikitaberezhnyj.saycheese.data
 import android.content.Context
 import com.nikitaberezhnyj.saycheese.constants.Constants
 import com.nikitaberezhnyj.saycheese.models.CameraSettings
+import com.nikitaberezhnyj.saycheese.models.PhotoFormat
 
 class CameraSettingsRepository(context: Context) {
 
@@ -29,7 +30,10 @@ class CameraSettingsRepository(context: Context) {
             speechRecognitionEnabled = prefs.getBoolean(
                 Constants.KEY_SPEECH_RECOGNITION,
                 Constants.DEFAULT_SPEECH_RECOGNITION
-            )
+            ),
+            photoFormat = PhotoFormat.entries.firstOrNull {
+                it.name == prefs.getString(Constants.KEY_PHOTO_FORMAT, null)
+            } ?: Constants.DEFAULT_PHOTO_FORMAT
         )
     }
 
@@ -60,6 +64,12 @@ class CameraSettingsRepository(context: Context) {
     fun saveSpeechRecognitionEnabled(value: Boolean) {
         prefs.edit()
             .putBoolean(Constants.KEY_SPEECH_RECOGNITION, value)
+            .apply()
+    }
+
+    fun savePhotoFormat(value: PhotoFormat) {
+        prefs.edit()
+            .putString(Constants.KEY_PHOTO_FORMAT, value.name)
             .apply()
     }
 }

@@ -54,17 +54,9 @@ class CameraController(
                     .build()
 
                 val useCaseGroup = UseCaseGroup.Builder()
-                    .setViewPort(
-                        ViewPort.Builder(
-                            Rational(
-                                Constants.PHOTO_ASPECT_WIDTH,
-                                Constants.PHOTO_ASPECT_HEIGHT
-                            ),
-                            Surface.ROTATION_0
-                        ).build()
-                    )
                     .addUseCase(preview)
                     .addUseCase(capture)
+                    .apply { view.viewPort?.let { setViewPort(it) } }
                     .build()
 
                 cameraProvider.unbindAll()

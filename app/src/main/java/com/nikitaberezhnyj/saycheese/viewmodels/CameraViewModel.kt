@@ -12,6 +12,7 @@ import com.nikitaberezhnyj.saycheese.controllers.CameraController
 import com.nikitaberezhnyj.saycheese.controllers.SpeechRecognizerController
 import com.nikitaberezhnyj.saycheese.data.CameraSettingsRepository
 import com.nikitaberezhnyj.saycheese.models.CameraUiState
+import com.nikitaberezhnyj.saycheese.models.PhotoFormat
 import com.nikitaberezhnyj.saycheese.models.SpeechStatusKey
 import com.nikitaberezhnyj.saycheese.models.VoiceCommand
 import com.nikitaberezhnyj.saycheese.utils.takePhoto
@@ -38,8 +39,8 @@ class CameraViewModel(
             flashEnabled = initialSettings.flashEnabled,
             gridEnabled = initialSettings.gridEnabled,
             timerSeconds = initialSettings.timerSeconds,
-            speechRecognitionEnabled =
-                initialSettings.speechRecognitionEnabled
+            photoFormat = initialSettings.photoFormat,
+            speechRecognitionEnabled = initialSettings.speechRecognitionEnabled
         )
     )
 
@@ -117,6 +118,11 @@ class CameraViewModel(
     fun setTimerSeconds(seconds: Int) {
         settingsRepository.saveTimerSeconds(seconds)
         _uiState.update { it.copy(timerSeconds = seconds) }
+    }
+
+    fun setPhotoFormat(format: PhotoFormat) {
+        settingsRepository.savePhotoFormat(format)
+        _uiState.update { it.copy(photoFormat = format) }
     }
 
     fun setSettingsVisible(visible: Boolean) {

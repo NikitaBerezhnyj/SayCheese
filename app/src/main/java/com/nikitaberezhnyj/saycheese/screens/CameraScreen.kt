@@ -40,6 +40,10 @@ fun CameraScreen(
     var focusPoint by remember { mutableStateOf<Offset?>(null) }
     val iconRotation = rememberIconRotation(uiState.deviceRotation)
 
+    val frameModifier = uiState.photoFormat.aspectRatio
+        ?.let { Modifier.aspectRatio(it) }
+        ?: Modifier.fillMaxSize()
+
     DisposableEffect(lifecycleOwner, viewModel) {
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
@@ -86,11 +90,7 @@ fun CameraScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Box(
-                    modifier = Modifier
-                        .aspectRatio(
-                            Constants.PHOTO_ASPECT_WIDTH.toFloat() /
-                                    Constants.PHOTO_ASPECT_HEIGHT
-                        )
+                    modifier = frameModifier
                         .pointerInput(Unit) {
                             detectTapGestures { offset ->
                                 focusPoint = offset
@@ -98,9 +98,7 @@ fun CameraScreen(
                             }
                         }
                         .pointerInput(Unit) {
-                            detectTransformGestures { _, _, zoom, _ ->
-                                viewModel.zoomBy(zoom)
-                            }
+                            detectTransformGestures { _, _, zoom, _ -> viewModel.zoomBy(zoom) }
                         }
                 ) {
                     CameraPreview(

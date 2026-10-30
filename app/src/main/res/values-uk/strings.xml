@@ -58,6 +58,11 @@
 
     <string name="zoom_format" translatable="false">%1$.1f×</string>
 
+    <string name="settings_photo_format">Формат фото</string>
+    <string name="format_3_4" translatable="false">3:4</string>
+    <string name="format_1_1" translatable="false">1:1</string>
+    <string name="format_full">На всю область</string>
+
     <!-- Camera state -->
     <string name="camera_not_ready">Камера не готова. Спробуйте ще раз.</string>
 

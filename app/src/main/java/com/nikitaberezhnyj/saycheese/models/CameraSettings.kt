@@ -5,5 +5,6 @@ data class CameraSettings(
     val flashEnabled: Boolean,
     val gridEnabled: Boolean,
     val timerSeconds: Int,
-    val speechRecognitionEnabled: Boolean
+    val speechRecognitionEnabled: Boolean,
+    val photoFormat: PhotoFormat
 )

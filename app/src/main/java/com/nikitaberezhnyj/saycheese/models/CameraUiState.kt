@@ -10,6 +10,7 @@ data class CameraUiState(
     val flashEnabled: Boolean = Constants.DEFAULT_FLASH_ENABLED,
     val gridEnabled: Boolean = Constants.DEFAULT_GRID_ENABLED,
     val timerSeconds: Int = Constants.DEFAULT_TIMER_SECONDS,
+    val photoFormat: PhotoFormat = Constants.DEFAULT_PHOTO_FORMAT,
     val speechRecognitionEnabled: Boolean =
         Constants.DEFAULT_SPEECH_RECOGNITION,
 

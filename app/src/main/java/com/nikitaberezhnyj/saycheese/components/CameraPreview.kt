@@ -7,6 +7,8 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.view.PreviewView
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.nikitaberezhnyj.saycheese.controllers.CameraController
@@ -20,6 +22,7 @@ fun CameraPreview(
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     var previewView by remember { mutableStateOf<PreviewView?>(null) }
+    var size by remember { mutableStateOf(IntSize.Zero) }
 
     AndroidView(
         factory = { ctx ->
@@ -31,11 +34,13 @@ fun CameraPreview(
                 scaleType = PreviewView.ScaleType.FILL_CENTER
             }.also { previewView = it }
         },
-        modifier = modifier
+        modifier = modifier.onSizeChanged { size = it }
     )
 
-    LaunchedEffect(previewView, lifecycleOwner, cameraSelector) {
+    LaunchedEffect(previewView, lifecycleOwner, cameraSelector, size) {
         val view = previewView ?: return@LaunchedEffect
+        if (size == IntSize.Zero) return@LaunchedEffect
+
         controller.bindCamera(view, lifecycleOwner, cameraSelector, flashEnabled)
     }
 
