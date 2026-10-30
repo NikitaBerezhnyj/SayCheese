@@ -1,5 +1,9 @@
 # SayCheese
 
+<p align="center">
+  <img src="./assets/icon.png" alt="App logo" width="200"/>
+</p>
+
 **SayCheese** is an Android mobile application that allows you to conveniently take photos using voice commands. Just say **"cheese"** to take a photo, or **"time"** to activate the timer — and the camera will do everything for you!
 
 ## Overview
