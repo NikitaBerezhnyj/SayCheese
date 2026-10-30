@@ -2,6 +2,7 @@ package com.nikitaberezhnyj.saycheese.controllers
 
 import android.content.Context
 import android.util.Log
+import com.nikitaberezhnyj.saycheese.models.VoiceCommand
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.json.JSONObject
 import org.vosk.Model
@@ -34,10 +35,7 @@ class SpeechRecognizerController(
         )
     }
 
-    fun startListening(
-        onCheeseHeard: () -> Unit,
-        onTimerHeard: () -> Unit
-    ): Boolean {
+    fun startListening(onCommand: (VoiceCommand) -> Unit): Boolean {
         val model = model ?: return false
         stopListening()
 
@@ -46,7 +44,7 @@ class SpeechRecognizerController(
             val service = SpeechService(recognizer, SAMPLE_RATE)
             this.recognizer = recognizer
             speechService = service
-            service.startListening(CommandListener(onCheeseHeard, onTimerHeard))
+            service.startListening(CommandListener(onCommand))
         } catch (e: Exception) {
             Log.e(TAG, "Failed to start listening", e)
             stopListening()
@@ -69,8 +67,7 @@ class SpeechRecognizerController(
     }
 
     private class CommandListener(
-        private val onCheeseHeard: () -> Unit,
-        private val onTimerHeard: () -> Unit
+        private val onCommand: (VoiceCommand) -> Unit
     ) : RecognitionListener {
         private var handled = false
 
@@ -96,18 +93,9 @@ class SpeechRecognizerController(
             val text = obj.optString("text").ifEmpty { obj.optString("partial") }
             if (text.isNotEmpty()) Log.d(TAG, "Heard: $text")
 
-            val words = text.split(" ")
-            return when {
-                CHEESE in words -> {
-                    onCheeseHeard(); true
-                }
-
-                TIMER in words -> {
-                    onTimerHeard(); true
-                }
-
-                else -> false
-            }
+            val command = VoiceCommand.entries.firstOrNull { it.phrase in text } ?: return false
+            onCommand(command)
+            return true
         }
     }
 
@@ -115,8 +103,7 @@ class SpeechRecognizerController(
         private const val TAG = "SpeechRecognizer"
         private const val MODEL_ASSET_DIR = "model-en-us"
         private const val SAMPLE_RATE = 16000f
-        private const val CHEESE = "cheese"
-        private const val TIMER = "timer"
-        private const val GRAMMAR = """["$CHEESE", "$TIMER", "[unk]"]"""
+        private val GRAMMAR = (VoiceCommand.entries.map { it.phrase } + "[unk]")
+            .joinToString(prefix = "[", postfix = "]") { "\"$it\"" }
     }
 }

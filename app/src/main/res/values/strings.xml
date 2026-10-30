@@ -56,6 +56,8 @@
     <string name="speech_heard_cheese">Cheese!</string>
     <string name="speech_heard_timer">Timer</string>
 
+    <string name="zoom_format" translatable="false">%1$.1f×</string>
+
     <!-- Camera state -->
     <string name="camera_not_ready">Camera not ready. Please try again.</string>
 

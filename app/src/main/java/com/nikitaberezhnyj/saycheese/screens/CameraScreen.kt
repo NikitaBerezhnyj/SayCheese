@@ -4,10 +4,14 @@ package com.nikitaberezhnyj.saycheese.screens
 
 import androidx.camera.core.CameraSelector
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -31,6 +35,8 @@ fun CameraScreen(
             .requireLensFacing(uiState.lensFacing)
             .build()
     }
+
+    var focusPoint by remember { mutableStateOf<Offset?>(null) }
 
     DisposableEffect(lifecycleOwner, viewModel) {
         val observer = LifecycleEventObserver { _, event ->
@@ -73,18 +79,43 @@ fun CameraScreen(
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .pointerInput(Unit) {
+                        detectTapGestures { offset ->
+                            focusPoint = offset
+                            viewModel.focusAt(offset.x, offset.y)
+                        }
+                    }
+                    .pointerInput(Unit) {
+                        detectTransformGestures { _, _, zoom, _ -> viewModel.zoomBy(zoom) }
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 CameraPreview(
-                    modifier = Modifier.fillMaxSize(),
+                    controller = viewModel.cameraController,
                     cameraSelector = cameraSelector,
                     flashEnabled = uiState.flashEnabled,
-                    onImageCaptureReady = viewModel::setImageCapture
+                    modifier = Modifier.fillMaxSize()
                 )
 
                 if (uiState.gridEnabled) {
                     GridOverlay()
+                }
+
+                ZoomIndicator(
+                    zoomRatio = uiState.zoomRatio,
+                    onReset = viewModel::resetZoom,
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(top = Spacing.M)
+                )
+
+                focusPoint?.let { point ->
+                    FocusRing(
+                        position = point,
+                        onFinished = { focusPoint = null },
+                        modifier = Modifier.align(Alignment.TopStart)
+                    )
                 }
 
                 if (uiState.flashVisible) {

@@ -99,14 +99,8 @@ fun SpeechHint(
             Spacer(Modifier.width(Spacing.S))
 
             when {
-                isHeard -> Text(
-                    text = stringResource(
-                        if (heardCommand == VoiceCommand.CHEESE) {
-                            R.string.speech_heard_cheese
-                        } else {
-                            R.string.speech_heard_timer
-                        }
-                    ),
+                heardCommand != null -> Text(
+                    text = stringResource(heardCommand.labelRes),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = OnAccent

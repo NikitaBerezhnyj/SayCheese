@@ -6,6 +6,7 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.nikitaberezhnyj.saycheese.controllers.CameraController
 import com.nikitaberezhnyj.saycheese.controllers.SpeechRecognizerController
 import com.nikitaberezhnyj.saycheese.data.CameraSettingsRepository
 import com.nikitaberezhnyj.saycheese.models.CameraUiState
@@ -41,6 +42,10 @@ class CameraViewModel(
     )
 
     val uiState = _uiState.asStateFlow()
+
+    val cameraController = CameraController(application) { ratio ->
+        _uiState.update { it.copy(zoomRatio = ratio) }
+    }
 
     private var imageCapture: ImageCapture? = null
 
@@ -78,6 +83,12 @@ class CameraViewModel(
         _uiState.update { it.copy(lensFacing = lensFacing) }
     }
 
+    fun zoomBy(factor: Float) = cameraController.zoomBy(factor)
+
+    fun resetZoom() = cameraController.setZoomRatio(1f)
+
+    fun focusAt(x: Float, y: Float) = cameraController.focusAt(x, y)
+
     fun setGridEnabled(enabled: Boolean) {
         settingsRepository.saveGridEnabled(enabled)
         _uiState.update { it.copy(gridEnabled = enabled) }
@@ -97,7 +108,7 @@ class CameraViewModel(
     }
 
     fun takePicture() {
-        val capture = imageCapture ?: return
+        val capture = cameraController.imageCapture ?: return
 
         _uiState.update { it.copy(flashVisible = true) }
 
@@ -209,6 +220,17 @@ class CameraViewModel(
         }
     }
 
+    private fun onVoiceCommand(command: VoiceCommand) {
+        if (_uiState.value.timerActive) return
+
+        onCommandHeard(command)
+
+        when (command) {
+            VoiceCommand.CHEESE -> takePicture()
+            VoiceCommand.TIMER -> startTimerPhoto()
+        }
+    }
+
     private fun startListeningIfReady() {
         val state = _uiState.value
 
@@ -220,20 +242,7 @@ class CameraViewModel(
             return
         }
 
-        val started = speechController.startListening(
-            onCheeseHeard = {
-                if (!_uiState.value.timerActive) {
-                    onCommandHeard(VoiceCommand.CHEESE)
-                    takePicture()
-                }
-            },
-            onTimerHeard = {
-                if (!_uiState.value.timerActive) {
-                    onCommandHeard(VoiceCommand.TIMER)
-                    startTimerPhoto()
-                }
-            }
-        )
+        val started = speechController.startListening(::onVoiceCommand)
 
         _uiState.update {
             it.copy(
