@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
+import android.media.MediaActionSound
 
 class CameraViewModel(
     application: Application
@@ -48,6 +49,10 @@ class CameraViewModel(
 
     val cameraController = CameraController(application) { ratio ->
         _uiState.update { it.copy(zoomRatio = ratio) }
+    }
+
+    private val shutterSound = MediaActionSound().apply {
+        load(MediaActionSound.SHUTTER_CLICK)
     }
 
     private val orientationListener = object : OrientationEventListener(application) {
@@ -136,6 +141,7 @@ class CameraViewModel(
     fun takePicture() {
         val capture = cameraController.imageCapture ?: return
 
+        shutterSound.play(MediaActionSound.SHUTTER_CLICK)
         _uiState.update { it.copy(flashVisible = true) }
 
         takePhoto(getApplication(), capture) { uri ->
@@ -285,6 +291,7 @@ class CameraViewModel(
 
     override fun onCleared() {
         speechController.release()
+        shutterSound.release()
         imageCapture = null
         super.onCleared()
     }
