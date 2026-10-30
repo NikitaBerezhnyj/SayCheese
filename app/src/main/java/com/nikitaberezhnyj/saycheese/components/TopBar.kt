@@ -16,6 +16,7 @@ import androidx.compose.ui.res.stringResource
 import com.nikitaberezhnyj.saycheese.R
 import com.nikitaberezhnyj.saycheese.theme.Accent
 import com.nikitaberezhnyj.saycheese.theme.BackgroundDark
+import com.nikitaberezhnyj.saycheese.theme.BarHeight
 import com.nikitaberezhnyj.saycheese.theme.IconSize
 import com.nikitaberezhnyj.saycheese.theme.Spacing
 import com.nikitaberezhnyj.saycheese.theme.TextPrimary
@@ -31,8 +32,8 @@ fun TopBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(BackgroundDark)
-            .padding(horizontal = Spacing.S, vertical = Spacing.XS),
+            .height(BarHeight.Top)
+            .padding(horizontal = Spacing.S),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {

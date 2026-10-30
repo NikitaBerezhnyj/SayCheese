@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.nikitaberezhnyj.saycheese.R
 import com.nikitaberezhnyj.saycheese.theme.Accent
 import com.nikitaberezhnyj.saycheese.theme.BackgroundDark
+import com.nikitaberezhnyj.saycheese.theme.BarHeight
 import com.nikitaberezhnyj.saycheese.theme.IconSize
 import com.nikitaberezhnyj.saycheese.theme.OnAccent
 import com.nikitaberezhnyj.saycheese.theme.Spacing
@@ -36,9 +37,14 @@ fun BottomBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(124.dp)
+            .height(BarHeight.Bottom)
             .background(BackgroundDark)
-            .padding(Spacing.M),
+            .padding(
+                top = Spacing.S,
+                bottom = Spacing.XXL,
+                start = Spacing.M,
+                end = Spacing.M,
+            ),
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ) {

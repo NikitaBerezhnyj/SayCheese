@@ -8,6 +8,7 @@ object Spacing {
     val M = 16.dp
     val L = 24.dp
     val XL = 32.dp
+    val XXL = 48.dp
 }
 
 object Radius {
@@ -21,4 +22,9 @@ object IconSize {
     val Medium = 28.dp
     val Large = 32.dp
     val XLarge = 64.dp
+}
+
+object BarHeight {
+    val Top = 56.dp
+    val Bottom = 148.dp
 }

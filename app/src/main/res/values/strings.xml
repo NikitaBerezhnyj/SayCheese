@@ -61,7 +61,7 @@
     <string name="settings_photo_format">Photo format</string>
     <string name="format_3_4" translatable="false">3:4</string>
     <string name="format_1_1" translatable="false">1:1</string>
-    <string name="format_full">Full area</string>
+    <string name="format_full">Full screen</string>
 
     <!-- Camera state -->
     <string name="camera_not_ready">Camera not ready. Please try again.</string>
