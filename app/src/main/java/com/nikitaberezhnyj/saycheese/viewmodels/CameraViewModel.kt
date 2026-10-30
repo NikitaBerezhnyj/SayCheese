@@ -111,7 +111,7 @@ class CameraViewModel(
 
     fun zoomBy(factor: Float) = cameraController.zoomBy(factor)
 
-    fun resetZoom() = cameraController.setZoomRatio(1f)
+    fun setZoom(ratio: Float) = cameraController.setZoomRatio(ratio)
 
     fun focusAt(x: Float, y: Float) = cameraController.focusAt(x, y)
 

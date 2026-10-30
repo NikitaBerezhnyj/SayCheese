@@ -3,7 +3,6 @@ package com.nikitaberezhnyj.saycheese.models
 import android.net.Uri
 import android.view.Surface
 import com.nikitaberezhnyj.saycheese.constants.Constants
-import com.nikitaberezhnyj.saycheese.models.SpeechStatusKey
 
 data class CameraUiState(
     val lensFacing: Int = Constants.DEFAULT_LENS_FACING,

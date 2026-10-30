@@ -15,10 +15,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import android.util.Rational
 import androidx.camera.core.UseCaseGroup
-import androidx.camera.core.ViewPort
-import com.nikitaberezhnyj.saycheese.constants.Constants
 
 class CameraController(
     private val context: Context,

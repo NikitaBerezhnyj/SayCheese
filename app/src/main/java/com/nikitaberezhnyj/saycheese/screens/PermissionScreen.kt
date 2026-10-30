@@ -11,8 +11,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Camera
-import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.outlined.CameraAlt
+import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -54,7 +54,7 @@ fun PermissionScreen(onResult: () -> Unit) {
         description = stringResource(R.string.permission_description)
     ) {
         PermissionItem(
-            icon = Icons.Filled.Camera,
+            icon = Icons.Outlined.CameraAlt,
             title = stringResource(R.string.permission_camera_title),
             description = stringResource(R.string.permission_camera_desc)
         )
@@ -62,7 +62,7 @@ fun PermissionScreen(onResult: () -> Unit) {
         Spacer(Modifier.height(Spacing.S))
 
         PermissionItem(
-            icon = Icons.Filled.Mic,
+            icon = Icons.Outlined.Mic,
             title = stringResource(R.string.permission_mic_title),
             description = stringResource(R.string.permission_mic_desc)
         )

@@ -5,25 +5,18 @@ package com.nikitaberezhnyj.saycheese.components
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CameraEnhance
 import androidx.compose.material.icons.filled.ChangeCircle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.nikitaberezhnyj.saycheese.R
-import com.nikitaberezhnyj.saycheese.theme.Accent
 import com.nikitaberezhnyj.saycheese.theme.BackgroundDark
 import com.nikitaberezhnyj.saycheese.theme.BarHeight
 import com.nikitaberezhnyj.saycheese.theme.IconSize
-import com.nikitaberezhnyj.saycheese.theme.OnAccent
 import com.nikitaberezhnyj.saycheese.theme.Spacing
 import com.nikitaberezhnyj.saycheese.theme.TextPrimary
 
@@ -50,29 +43,14 @@ fun BottomBar(
     ) {
         PhotoThumbnail(lastPhotoUri, iconRotation)
 
-        IconButton(
-            onClick = onTakePhoto,
-            modifier = Modifier
-                .size(64.dp)
-                .clip(CircleShape)
-                .background(Accent)
-        ) {
-            Icon(
-                imageVector = Icons.Filled.CameraEnhance,
-                contentDescription = stringResource(R.string.desc_take_photo),
-                tint = OnAccent,
-                modifier = Modifier
-                    .size(IconSize.Large)
-                    .graphicsLayer { rotationZ = iconRotation() }
-            )
-        }
+        ShutterButton(onClick = onTakePhoto)
 
         IconButton(onClick = onSwitchCamera) {
             Icon(
                 imageVector = Icons.Filled.ChangeCircle,
                 contentDescription = stringResource(R.string.desc_switch_camera),
                 tint = TextPrimary,
-                modifier = Modifier.size(IconSize.Medium)
+                modifier = Modifier.size(IconSize.Large)
             )
         }
     }

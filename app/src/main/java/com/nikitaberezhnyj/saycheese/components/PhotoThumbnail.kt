@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PhotoLibrary
+import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -52,7 +52,7 @@ fun PhotoThumbnail(uri: Uri?, rotation: () -> Float) {
             )
         } else {
             Icon(
-                imageVector = Icons.Default.PhotoLibrary,
+                imageVector = Icons.Outlined.PhotoLibrary,
                 contentDescription = null,
                 tint = TextSecondary,
                 modifier = Modifier.size(IconSize.Small)

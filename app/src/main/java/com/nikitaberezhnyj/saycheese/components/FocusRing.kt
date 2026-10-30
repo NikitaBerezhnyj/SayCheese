@@ -17,7 +17,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.nikitaberezhnyj.saycheese.theme.Accent
+import com.nikitaberezhnyj.saycheese.theme.Highlight
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.milliseconds
@@ -56,6 +56,6 @@ fun FocusRing(
                 scaleY = scale.value
                 this.alpha = alpha.value
             }
-            .border(2.dp, Accent, CircleShape)
+            .border(2.dp, Highlight, CircleShape)
     )
 }

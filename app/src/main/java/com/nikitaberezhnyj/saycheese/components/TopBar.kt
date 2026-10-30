@@ -2,10 +2,11 @@
 
 package com.nikitaberezhnyj.saycheese.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.FlashOff
+import androidx.compose.material.icons.outlined.FlashOn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
@@ -14,8 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import com.nikitaberezhnyj.saycheese.R
-import com.nikitaberezhnyj.saycheese.theme.Accent
-import com.nikitaberezhnyj.saycheese.theme.BackgroundDark
 import com.nikitaberezhnyj.saycheese.theme.BarHeight
 import com.nikitaberezhnyj.saycheese.theme.IconSize
 import com.nikitaberezhnyj.saycheese.theme.Spacing
@@ -26,7 +25,6 @@ fun TopBar(
     flashEnabled: Boolean,
     iconRotation: () -> Float,
     onFlashToggle: () -> Unit,
-    onTimerClick: () -> Unit,
     onSettingsClick: () -> Unit
 ) {
     Row(
@@ -39,19 +37,8 @@ fun TopBar(
     ) {
         IconButton(onClick = onFlashToggle) {
             Icon(
-                imageVector = if (flashEnabled) Icons.Filled.FlashOn else Icons.Filled.FlashOff,
+                imageVector = if (flashEnabled) Icons.Outlined.FlashOn else Icons.Outlined.FlashOff,
                 contentDescription = stringResource(R.string.desc_flash),
-                tint = if (flashEnabled) Accent else TextPrimary,
-                modifier = Modifier
-                    .size(IconSize.Medium)
-                    .graphicsLayer { rotationZ = iconRotation() }
-            )
-        }
-
-        IconButton(onClick = onTimerClick) {
-            Icon(
-                imageVector = Icons.Filled.Timer,
-                contentDescription = stringResource(R.string.desc_take_photo_with_timer),
                 tint = TextPrimary,
                 modifier = Modifier
                     .size(IconSize.Medium)

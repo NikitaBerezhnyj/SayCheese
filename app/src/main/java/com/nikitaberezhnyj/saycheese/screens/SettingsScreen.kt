@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -69,7 +69,7 @@ fun SettingsScreen(
         ) {
             IconButton(onClick = { viewModel.setSettingsVisible(false) }) {
                 Icon(
-                    imageVector = Icons.Filled.ArrowBack,
+                    imageVector = Icons.Outlined.ArrowBack,
                     contentDescription = stringResource(R.string.desc_back),
                     tint = TextPrimary,
                     modifier = Modifier.size(IconSize.Medium)

@@ -10,7 +10,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.GraphicEq
+import androidx.compose.material.icons.outlined.MicOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -80,9 +82,9 @@ fun SpeechHint(
     ) {
         Icon(
             imageVector = when {
-                isHeard -> Icons.Default.Check
-                isError -> Icons.Default.MicOff
-                else -> Icons.Default.GraphicEq
+                isHeard -> Icons.Outlined.Check
+                isError -> Icons.Outlined.MicOff
+                else -> Icons.Outlined.GraphicEq
             },
             contentDescription = null,
             tint = when {

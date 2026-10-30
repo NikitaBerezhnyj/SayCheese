@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -132,7 +133,6 @@ fun CameraScreen(
                     flashEnabled = uiState.flashEnabled,
                     iconRotation = { iconRotation.value },
                     onFlashToggle = viewModel::toggleFlash,
-                    onTimerClick = viewModel::startTimerPhoto,
                     onSettingsClick = { viewModel.setSettingsVisible(true) }
                 )
             }
@@ -142,14 +142,6 @@ fun CameraScreen(
                     .weight(1f)
                     .fillMaxWidth()
             ) {
-                ZoomIndicator(
-                    zoomRatio = uiState.zoomRatio,
-                    onReset = viewModel::resetZoom,
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .padding(top = Spacing.M)
-                )
-
                 if (uiState.timerActive) {
                     TimerCounter(
                         uiState.timerSeconds,
@@ -158,21 +150,47 @@ fun CameraScreen(
                     )
                 }
 
-                if (uiState.speechRecognitionEnabled) {
-                    SpeechHint(
-                        statusKey = uiState.speechStatusKey,
-                        heardCommand = uiState.heardCommand,
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .padding(bottom = Spacing.S),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(Spacing.S)
+                ) {
+                    if (uiState.speechRecognitionEnabled) {
+                        SpeechHint(
+                            statusKey = uiState.speechStatusKey,
+                            heardCommand = uiState.heardCommand
+                        )
+                    }
+
+                    Box(
                         modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .padding(bottom = Spacing.M)
-                    )
+                            .fillMaxWidth()
+                            .height(44.dp)
+                            .padding(horizontal = Spacing.M)
+                    ) {
+                        if (uiState.timerSeconds > 0) {
+                            TimerButton(
+                                iconRotation = { iconRotation.value },
+                                onClick = viewModel::startTimerPhoto,
+                                modifier = Modifier.align(Alignment.CenterStart)
+                            )
+                        }
+
+                        ZoomIndicator(
+                            zoomRatio = uiState.zoomRatio,
+                            onReset = { viewModel.setZoom(1f) },
+                            modifier = Modifier.align(Alignment.CenterEnd)
+                        )
+                    }
                 }
             }
 
             Box(
                 modifier = Modifier
                     .background(barColor)
-                // .navigationBarsPadding()
             ) {
                 BottomBar(
                     lastPhotoUri = uiState.lastPhotoUri,
