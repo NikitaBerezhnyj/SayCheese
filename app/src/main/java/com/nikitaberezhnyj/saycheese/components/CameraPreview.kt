@@ -53,12 +53,7 @@ fun CameraPreview(
         modifier = modifier
     )
 
-    LaunchedEffect(
-        previewView,
-        lifecycleOwner,
-        cameraSelector,
-        flashEnabled
-    ) {
+    LaunchedEffect(previewView, lifecycleOwner, cameraSelector) {
         val view = previewView ?: return@LaunchedEffect
 
         cameraController.bindCamera(
@@ -70,6 +65,10 @@ fun CameraPreview(
                 currentCallback.value(capture)
             }
         )
+    }
+
+    LaunchedEffect(flashEnabled) {
+        cameraController.setFlash(flashEnabled)
     }
 
     DisposableEffect(cameraController) {

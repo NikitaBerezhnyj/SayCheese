@@ -2,17 +2,18 @@ package com.nikitaberezhnyj.saycheese.utils
 
 import android.content.Context
 import android.content.res.Configuration
-import android.os.Build
 import java.util.Locale
 
 object LocaleUtils {
     private const val PREFS_NAME = "app_settings"
     private const val KEY_LANGUAGE = "language"
-    private val supportedLanguages = listOf("en", "uk")
+
+    private val supportedLanguages = setOf("en", "uk")
 
     fun resolveLanguage(context: Context): String {
         val saved = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .getString(KEY_LANGUAGE, null)
+
         val system = Locale.getDefault().language
 
         return when {
@@ -23,6 +24,10 @@ object LocaleUtils {
     }
 
     fun saveLanguage(context: Context, language: String) {
+        require(language in supportedLanguages) {
+            "Unsupported language: $language"
+        }
+
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit()
             .putString(KEY_LANGUAGE, language)
@@ -30,18 +35,16 @@ object LocaleUtils {
     }
 
     fun setLocale(context: Context, languageCode: String): Context {
-        val locale = Locale(languageCode)
+        require(languageCode in supportedLanguages) {
+            "Unsupported language: $languageCode"
+        }
+
+        val locale = Locale.forLanguageTag(languageCode)
         Locale.setDefault(locale)
 
         val config = Configuration(context.resources.configuration)
         config.setLocale(locale)
 
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            context.createConfigurationContext(config)
-        } else {
-            @Suppress("DEPRECATION")
-            context.resources.updateConfiguration(config, context.resources.displayMetrics)
-            context
-        }
+        return context.createConfigurationContext(config)
     }
 }

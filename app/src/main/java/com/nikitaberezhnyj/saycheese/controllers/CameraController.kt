@@ -16,6 +16,8 @@ class CameraController(
     private val cameraProviderFuture =
         ProcessCameraProvider.getInstance(context)
 
+    private var imageCapture: ImageCapture? = null
+
     fun bindCamera(
         previewView: PreviewView,
         lifecycleOwner: LifecycleOwner,
@@ -28,14 +30,8 @@ class CameraController(
                 val cameraProvider = cameraProviderFuture.get()
 
                 val preview = Preview.Builder().build()
-                val imageCapture = ImageCapture.Builder()
-                    .setFlashMode(
-                        if (flashEnabled) {
-                            ImageCapture.FLASH_MODE_ON
-                        } else {
-                            ImageCapture.FLASH_MODE_OFF
-                        }
-                    )
+                val capture = ImageCapture.Builder()
+                    .setFlashMode(flashMode(flashEnabled))
                     .build()
 
                 preview.setSurfaceProvider(previewView.surfaceProvider)
@@ -45,21 +41,23 @@ class CameraController(
                     lifecycleOwner,
                     cameraSelector,
                     preview,
-                    imageCapture
+                    capture
                 )
 
-                onImageCaptureReady(imageCapture)
+                imageCapture = capture
+                onImageCaptureReady(capture)
             } catch (e: Exception) {
-                Log.e(
-                    TAG,
-                    "Camera initialization failed",
-                    e
-                )
+                Log.e(TAG, "Camera initialization failed", e)
             }
         }, ContextCompat.getMainExecutor(context))
     }
 
+    fun setFlash(enabled: Boolean) {
+        imageCapture?.flashMode = flashMode(enabled)
+    }
+
     fun unbindCamera() {
+        imageCapture = null
         try {
             if (cameraProviderFuture.isDone) {
                 cameraProviderFuture.get().unbindAll()
@@ -68,6 +66,9 @@ class CameraController(
             Log.e(TAG, "Failed to unbind camera", e)
         }
     }
+
+    private fun flashMode(enabled: Boolean) =
+        if (enabled) ImageCapture.FLASH_MODE_ON else ImageCapture.FLASH_MODE_OFF
 
     companion object {
         private const val TAG = "CameraController"
