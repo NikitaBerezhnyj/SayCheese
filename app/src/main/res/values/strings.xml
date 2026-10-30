@@ -52,6 +52,10 @@
     <string name="desc_flash">Flash</string>
     <string name="desc_settings">Settings</string>
 
+    <!-- ... -->
+    <string name="speech_heard_cheese">Cheese!</string>
+    <string name="speech_heard_timer">Timer</string>
+
     <!-- Camera state -->
     <string name="camera_not_ready">Camera not ready. Please try again.</string>
 

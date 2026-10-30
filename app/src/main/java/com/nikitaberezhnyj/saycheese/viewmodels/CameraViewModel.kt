@@ -10,7 +10,9 @@ import com.nikitaberezhnyj.saycheese.controllers.SpeechRecognizerController
 import com.nikitaberezhnyj.saycheese.data.CameraSettingsRepository
 import com.nikitaberezhnyj.saycheese.models.CameraUiState
 import com.nikitaberezhnyj.saycheese.models.SpeechStatusKey
+import com.nikitaberezhnyj.saycheese.models.VoiceCommand
 import com.nikitaberezhnyj.saycheese.utils.takePhoto
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -44,6 +46,8 @@ class CameraViewModel(
 
     private var isResumed = false
     private var isInitializingSpeech = false
+
+    private var heardJob: Job? = null
 
     fun setImageCapture(capture: ImageCapture?) {
         imageCapture = capture
@@ -195,6 +199,16 @@ class CameraViewModel(
         }
     }
 
+    private fun onCommandHeard(command: VoiceCommand) {
+        heardJob?.cancel()
+        _uiState.update { it.copy(heardCommand = command) }
+
+        heardJob = viewModelScope.launch {
+            delay(1200.milliseconds)
+            _uiState.update { it.copy(heardCommand = null) }
+        }
+    }
+
     private fun startListeningIfReady() {
         val state = _uiState.value
 
@@ -208,10 +222,16 @@ class CameraViewModel(
 
         val started = speechController.startListening(
             onCheeseHeard = {
-                if (!_uiState.value.timerActive) takePicture()
+                if (!_uiState.value.timerActive) {
+                    onCommandHeard(VoiceCommand.CHEESE)
+                    takePicture()
+                }
             },
             onTimerHeard = {
-                if (!_uiState.value.timerActive) startTimerPhoto()
+                if (!_uiState.value.timerActive) {
+                    onCommandHeard(VoiceCommand.TIMER)
+                    startTimerPhoto()
+                }
             }
         )
 

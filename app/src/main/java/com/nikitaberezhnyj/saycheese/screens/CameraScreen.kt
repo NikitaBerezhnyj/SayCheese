@@ -102,6 +102,7 @@ fun CameraScreen(
                 if (uiState.speechRecognitionEnabled) {
                     SpeechHint(
                         statusKey = uiState.speechStatusKey,
+                        heardCommand = uiState.heardCommand,
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
                             .padding(bottom = Spacing.M)

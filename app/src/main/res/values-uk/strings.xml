@@ -52,6 +52,10 @@
     <string name="desc_flash">Спалах</string>
     <string name="desc_settings">Налаштування</string>
 
+    <!-- ... -->
+    <string name="speech_heard_cheese">Cheese!</string>
+    <string name="speech_heard_timer">Таймер</string>
+
     <!-- Camera state -->
     <string name="camera_not_ready">Камера не готова. Спробуйте ще раз.</string>
 

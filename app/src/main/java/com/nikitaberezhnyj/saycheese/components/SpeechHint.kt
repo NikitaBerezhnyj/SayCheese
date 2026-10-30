@@ -2,41 +2,57 @@
 
 package com.nikitaberezhnyj.saycheese.components
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.nikitaberezhnyj.saycheese.R
 import com.nikitaberezhnyj.saycheese.models.SpeechStatusKey
+import com.nikitaberezhnyj.saycheese.models.VoiceCommand
 import com.nikitaberezhnyj.saycheese.theme.Accent
 import com.nikitaberezhnyj.saycheese.theme.BackgroundDark
 import com.nikitaberezhnyj.saycheese.theme.DangerText
 import com.nikitaberezhnyj.saycheese.theme.IconSize
-import com.nikitaberezhnyj.saycheese.theme.Radius
+import com.nikitaberezhnyj.saycheese.theme.OnAccent
 import com.nikitaberezhnyj.saycheese.theme.Spacing
 import com.nikitaberezhnyj.saycheese.theme.TextPrimary
 import com.nikitaberezhnyj.saycheese.theme.TextSecondary
+import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun SpeechHint(
     statusKey: SpeechStatusKey,
+    heardCommand: VoiceCommand?,
     modifier: Modifier = Modifier
 ) {
     if (statusKey != SpeechStatusKey.LISTENING && statusKey != SpeechStatusKey.ERROR_INIT) return
 
     val isError = statusKey == SpeechStatusKey.ERROR_INIT
+    val isHeard = heardCommand != null
+
+    var expanded by remember { mutableStateOf(true) }
+    LaunchedEffect(expanded) {
+        if (expanded) {
+            delay(4.seconds)
+            expanded = false
+        }
+    }
 
     val pulse by rememberInfiniteTransition(label = "pulse").animateFloat(
         initialValue = 0.9f,
@@ -48,42 +64,73 @@ fun SpeechHint(
         label = "scale"
     )
 
+    val background by animateColorAsState(
+        targetValue = if (isHeard) Accent else BackgroundDark.copy(alpha = 0.7f),
+        label = "background"
+    )
+
     Row(
         modifier = modifier
-            .background(BackgroundDark.copy(alpha = 0.7f), RoundedCornerShape(Radius.M))
+            .clip(CircleShape)
+            .background(background)
+            .clickable { expanded = !expanded }
+            .animateContentSize()
             .padding(horizontal = Spacing.M, vertical = Spacing.S),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            imageVector = if (isError) Icons.Default.MicOff else Icons.Default.GraphicEq,
+            imageVector = when {
+                isHeard -> Icons.Default.Check
+                isError -> Icons.Default.MicOff
+                else -> Icons.Default.GraphicEq
+            },
             contentDescription = null,
-            tint = if (isError) DangerText else Accent,
+            tint = when {
+                isHeard -> OnAccent
+                isError -> DangerText
+                else -> Accent
+            },
             modifier = Modifier
                 .size(IconSize.Medium)
-                .scale(if (isError) 1f else pulse)
+                .scale(if (isHeard || isError) 1f else pulse)
         )
 
-        Spacer(Modifier.width(Spacing.S))
+        if (expanded || isHeard) {
+            Spacer(Modifier.width(Spacing.S))
 
-        if (isError) {
-            Text(
-                text = stringResource(R.string.speech_unavailable),
-                fontSize = 14.sp,
-                color = TextPrimary
-            )
-        } else {
-            Column {
-                Text(
-                    text = stringResource(R.string.speech_hint_title),
+            when {
+                isHeard -> Text(
+                    text = stringResource(
+                        if (heardCommand == VoiceCommand.CHEESE) {
+                            R.string.speech_heard_cheese
+                        } else {
+                            R.string.speech_heard_timer
+                        }
+                    ),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
+                    color = OnAccent
+                )
+
+                isError -> Text(
+                    text = stringResource(R.string.speech_unavailable),
+                    fontSize = 14.sp,
                     color = TextPrimary
                 )
-                Text(
-                    text = stringResource(R.string.speech_hint_subtitle),
-                    fontSize = 12.sp,
-                    color = TextSecondary
-                )
+
+                else -> Column {
+                    Text(
+                        text = stringResource(R.string.speech_hint_title),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = TextPrimary
+                    )
+                    Text(
+                        text = stringResource(R.string.speech_hint_subtitle),
+                        fontSize = 12.sp,
+                        color = TextSecondary
+                    )
+                }
             }
         }
     }

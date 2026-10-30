@@ -16,6 +16,7 @@ data class CameraUiState(
     val flashVisible: Boolean = false,
     val timerActive: Boolean = false,
     val lastPhotoUri: Uri? = null,
+    val heardCommand: VoiceCommand? = null,
 
     val speechModelInitialized: Boolean = false,
     val speechStatusKey: SpeechStatusKey = SpeechStatusKey.LOADING
