@@ -2,6 +2,8 @@ package com.nikitaberezhnyj.saycheese.viewmodels
 
 import android.app.Application
 import android.util.Log
+import android.view.OrientationEventListener
+import android.view.Surface
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.lifecycle.AndroidViewModel
@@ -45,6 +47,24 @@ class CameraViewModel(
 
     val cameraController = CameraController(application) { ratio ->
         _uiState.update { it.copy(zoomRatio = ratio) }
+    }
+
+    private val orientationListener = object : OrientationEventListener(application) {
+        override fun onOrientationChanged(orientation: Int) {
+            if (orientation == OrientationEventListener.ORIENTATION_UNKNOWN) return
+
+            val rotation = when (orientation) {
+                in 45..134 -> Surface.ROTATION_270
+                in 135..224 -> Surface.ROTATION_180
+                in 225..314 -> Surface.ROTATION_90
+                else -> Surface.ROTATION_0
+            }
+
+            if (rotation != _uiState.value.deviceRotation) {
+                cameraController.setPhotoRotation(rotation)
+                _uiState.update { it.copy(deviceRotation = rotation) }
+            }
+        }
     }
 
     private var imageCapture: ImageCapture? = null
@@ -198,11 +218,13 @@ class CameraViewModel(
 
     fun onResume() {
         isResumed = true
+        if (orientationListener.canDetectOrientation()) orientationListener.enable()
         startListeningIfReady()
     }
 
     fun onPause() {
         isResumed = false
+        orientationListener.disable()
         speechController.stopListening()
 
         _uiState.update {

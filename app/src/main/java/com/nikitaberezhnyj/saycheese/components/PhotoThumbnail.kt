@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -30,12 +31,13 @@ import com.nikitaberezhnyj.saycheese.theme.SurfaceDark
 import com.nikitaberezhnyj.saycheese.theme.TextSecondary
 
 @Composable
-fun PhotoThumbnail(uri: Uri?) {
+fun PhotoThumbnail(uri: Uri?, rotation: () -> Float) {
     val context = LocalContext.current
 
     Box(
         modifier = Modifier
             .size(48.dp)
+            .graphicsLayer { rotationZ = rotation() }
             .clip(RoundedCornerShape(Radius.S))
             .background(SurfaceDark)
             .then(if (uri != null) Modifier.clickable { openPhoto(context, uri) } else Modifier),

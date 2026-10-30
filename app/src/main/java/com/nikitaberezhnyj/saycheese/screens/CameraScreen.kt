@@ -37,6 +37,7 @@ fun CameraScreen(
     }
 
     var focusPoint by remember { mutableStateOf<Offset?>(null) }
+    val iconRotation = rememberIconRotation(uiState.deviceRotation)
 
     DisposableEffect(lifecycleOwner, viewModel) {
         val observer = LifecycleEventObserver { _, event ->
@@ -71,6 +72,7 @@ fun CameraScreen(
         ) {
             TopBar(
                 flashEnabled = uiState.flashEnabled,
+                iconRotation = { iconRotation.value },
                 onFlashToggle = viewModel::toggleFlash,
                 onTimerClick = viewModel::startTimerPhoto,
                 onSettingsClick = { viewModel.setSettingsVisible(true) }
@@ -143,6 +145,7 @@ fun CameraScreen(
 
             BottomBar(
                 lastPhotoUri = uiState.lastPhotoUri,
+                iconRotation = { iconRotation.value },
                 onTakePhoto = viewModel::takePicture,
                 onSwitchCamera = viewModel::switchCamera
             )

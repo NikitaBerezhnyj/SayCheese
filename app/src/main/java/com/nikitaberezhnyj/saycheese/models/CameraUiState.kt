@@ -1,6 +1,7 @@
 package com.nikitaberezhnyj.saycheese.models
 
 import android.net.Uri
+import android.view.Surface
 import com.nikitaberezhnyj.saycheese.constants.Constants
 import com.nikitaberezhnyj.saycheese.models.SpeechStatusKey
 
@@ -18,6 +19,7 @@ data class CameraUiState(
     val lastPhotoUri: Uri? = null,
     val heardCommand: VoiceCommand? = null,
     val zoomRatio: Float = 1f,
+    val deviceRotation: Int = Surface.ROTATION_0,
 
     val speechModelInitialized: Boolean = false,
     val speechStatusKey: SpeechStatusKey = SpeechStatusKey.LOADING

@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.nikitaberezhnyj.saycheese.R
@@ -28,6 +29,7 @@ import com.nikitaberezhnyj.saycheese.theme.TextPrimary
 @Composable
 fun BottomBar(
     lastPhotoUri: Uri?,
+    iconRotation: () -> Float,
     onTakePhoto: () -> Unit,
     onSwitchCamera: () -> Unit
 ) {
@@ -40,7 +42,7 @@ fun BottomBar(
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        PhotoThumbnail(lastPhotoUri)
+        PhotoThumbnail(lastPhotoUri, iconRotation)
 
         IconButton(
             onClick = onTakePhoto,
@@ -53,7 +55,9 @@ fun BottomBar(
                 imageVector = Icons.Filled.CameraEnhance,
                 contentDescription = stringResource(R.string.desc_take_photo),
                 tint = OnAccent,
-                modifier = Modifier.size(IconSize.Large)
+                modifier = Modifier
+                    .size(IconSize.Large)
+                    .graphicsLayer { rotationZ = iconRotation() }
             )
         }
 

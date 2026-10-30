@@ -2,6 +2,7 @@ package com.nikitaberezhnyj.saycheese.controllers
 
 import android.content.Context
 import android.util.Log
+import android.view.Surface
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.FocusMeteringAction
@@ -23,6 +24,7 @@ class CameraController(
 
     private var camera: Camera? = null
     private var previewView: PreviewView? = null
+    private var photoRotation = Surface.ROTATION_0
     private var zoomLiveData: LiveData<ZoomState>? = null
     private val zoomObserver = Observer<ZoomState> { onZoomChanged(it.zoomRatio) }
 
@@ -44,6 +46,7 @@ class CameraController(
 
                 val capture = ImageCapture.Builder()
                     .setFlashMode(flashMode(flashEnabled))
+                    .setTargetRotation(photoRotation)
                     .build()
 
                 cameraProvider.unbindAll()
@@ -82,6 +85,11 @@ class CameraController(
 
     fun setFlash(enabled: Boolean) {
         imageCapture?.flashMode = flashMode(enabled)
+    }
+
+    fun setPhotoRotation(rotation: Int) {
+        photoRotation = rotation
+        imageCapture?.targetRotation = rotation
     }
 
     fun setZoomRatio(ratio: Float) {
