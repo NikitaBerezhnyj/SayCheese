@@ -15,6 +15,10 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import android.util.Rational
+import androidx.camera.core.UseCaseGroup
+import androidx.camera.core.ViewPort
+import com.nikitaberezhnyj.saycheese.constants.Constants
 
 class CameraController(
     private val context: Context,
@@ -49,12 +53,26 @@ class CameraController(
                     .setTargetRotation(photoRotation)
                     .build()
 
+                val useCaseGroup = UseCaseGroup.Builder()
+                    .setViewPort(
+                        ViewPort.Builder(
+                            Rational(
+                                Constants.PHOTO_ASPECT_WIDTH,
+                                Constants.PHOTO_ASPECT_HEIGHT
+                            ),
+                            Surface.ROTATION_0
+                        ).build()
+                    )
+                    .addUseCase(preview)
+                    .addUseCase(capture)
+                    .build()
+
                 cameraProvider.unbindAll()
+
                 val boundCamera = cameraProvider.bindToLifecycle(
                     lifecycleOwner,
                     cameraSelector,
-                    preview,
-                    capture
+                    useCaseGroup
                 )
 
                 camera = boundCamera

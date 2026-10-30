@@ -24,4 +24,6 @@ object Constants {
     const val DEFAULT_TIMER_SECONDS = 3
     const val DEFAULT_SPEECH_RECOGNITION = true
 
+    const val PHOTO_ASPECT_WIDTH = 3
+    const val PHOTO_ASPECT_HEIGHT = 4
 }

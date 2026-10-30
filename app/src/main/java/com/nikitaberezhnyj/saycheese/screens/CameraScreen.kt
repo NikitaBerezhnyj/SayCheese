@@ -18,6 +18,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nikitaberezhnyj.saycheese.components.*
+import com.nikitaberezhnyj.saycheese.constants.Constants
 import com.nikitaberezhnyj.saycheese.viewmodels.CameraViewModel
 import com.nikitaberezhnyj.saycheese.theme.BackgroundDark
 import com.nikitaberezhnyj.saycheese.theme.Spacing
@@ -81,43 +82,45 @@ fun CameraScreen(
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxWidth()
-                    .pointerInput(Unit) {
-                        detectTapGestures { offset ->
-                            focusPoint = offset
-                            viewModel.focusAt(offset.x, offset.y)
-                        }
-                    }
-                    .pointerInput(Unit) {
-                        detectTransformGestures { _, _, zoom, _ -> viewModel.zoomBy(zoom) }
-                    },
+                    .fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                CameraPreview(
-                    controller = viewModel.cameraController,
-                    cameraSelector = cameraSelector,
-                    flashEnabled = uiState.flashEnabled,
-                    modifier = Modifier.fillMaxSize()
-                )
-
-                if (uiState.gridEnabled) {
-                    GridOverlay()
-                }
-
-                ZoomIndicator(
-                    zoomRatio = uiState.zoomRatio,
-                    onReset = viewModel::resetZoom,
+                Box(
                     modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .padding(top = Spacing.M)
-                )
-
-                focusPoint?.let { point ->
-                    FocusRing(
-                        position = point,
-                        onFinished = { focusPoint = null },
-                        modifier = Modifier.align(Alignment.TopStart)
+                        .aspectRatio(
+                            Constants.PHOTO_ASPECT_WIDTH.toFloat() /
+                                    Constants.PHOTO_ASPECT_HEIGHT
+                        )
+                        .pointerInput(Unit) {
+                            detectTapGestures { offset ->
+                                focusPoint = offset
+                                viewModel.focusAt(offset.x, offset.y)
+                            }
+                        }
+                        .pointerInput(Unit) {
+                            detectTransformGestures { _, _, zoom, _ ->
+                                viewModel.zoomBy(zoom)
+                            }
+                        }
+                ) {
+                    CameraPreview(
+                        controller = viewModel.cameraController,
+                        cameraSelector = cameraSelector,
+                        flashEnabled = uiState.flashEnabled,
+                        modifier = Modifier.fillMaxSize()
                     )
+
+                    if (uiState.gridEnabled) {
+                        GridOverlay()
+                    }
+
+                    focusPoint?.let { point ->
+                        FocusRing(
+                            position = point,
+                            onFinished = { focusPoint = null },
+                            modifier = Modifier.align(Alignment.TopStart)
+                        )
+                    }
                 }
 
                 if (uiState.flashVisible) {
@@ -131,6 +134,14 @@ fun CameraScreen(
                         Modifier.align(Alignment.Center)
                     )
                 }
+
+                ZoomIndicator(
+                    zoomRatio = uiState.zoomRatio,
+                    onReset = viewModel::resetZoom,
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(top = Spacing.M)
+                )
 
                 if (uiState.speechRecognitionEnabled) {
                     SpeechHint(
