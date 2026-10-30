@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nikitaberezhnyj.saycheese.R
 import com.nikitaberezhnyj.saycheese.theme.BackgroundDark
+import com.nikitaberezhnyj.saycheese.theme.FontSize
 import com.nikitaberezhnyj.saycheese.theme.Radius
 import com.nikitaberezhnyj.saycheese.theme.Spacing
 import com.nikitaberezhnyj.saycheese.theme.TextPrimary
@@ -45,7 +46,7 @@ fun ScreenLayout(
 
         Text(
             text = title,
-            fontSize = 24.sp,
+            fontSize = FontSize.Title,
             fontWeight = FontWeight.Bold,
             color = TextPrimary,
             textAlign = TextAlign.Center
@@ -55,8 +56,8 @@ fun ScreenLayout(
 
         Text(
             text = description,
-            fontSize = 14.sp,
-            lineHeight = 20.sp,
+            fontSize = FontSize.Small,
+            lineHeight = FontSize.Body,
             color = TextSecondary,
             textAlign = TextAlign.Center
         )

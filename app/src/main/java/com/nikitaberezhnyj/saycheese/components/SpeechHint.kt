@@ -29,6 +29,7 @@ import com.nikitaberezhnyj.saycheese.models.VoiceCommand
 import com.nikitaberezhnyj.saycheese.theme.Accent
 import com.nikitaberezhnyj.saycheese.theme.BackgroundDark
 import com.nikitaberezhnyj.saycheese.theme.DangerText
+import com.nikitaberezhnyj.saycheese.theme.FontSize
 import com.nikitaberezhnyj.saycheese.theme.IconSize
 import com.nikitaberezhnyj.saycheese.theme.OnAccent
 import com.nikitaberezhnyj.saycheese.theme.Spacing
@@ -103,27 +104,27 @@ fun SpeechHint(
             when {
                 heardCommand != null -> Text(
                     text = stringResource(heardCommand.labelRes),
-                    fontSize = 16.sp,
+                    fontSize = FontSize.Body,
                     fontWeight = FontWeight.SemiBold,
                     color = OnAccent
                 )
 
                 isError -> Text(
                     text = stringResource(R.string.speech_unavailable),
-                    fontSize = 14.sp,
+                    fontSize = FontSize.Small,
                     color = TextPrimary
                 )
 
                 else -> Column {
                     Text(
                         text = stringResource(R.string.speech_hint_title),
-                        fontSize = 16.sp,
+                        fontSize = FontSize.Body,
                         fontWeight = FontWeight.SemiBold,
                         color = TextPrimary
                     )
                     Text(
                         text = stringResource(R.string.speech_hint_subtitle),
-                        fontSize = 12.sp,
+                        fontSize = FontSize.Small,
                         color = TextSecondary
                     )
                 }

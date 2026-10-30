@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.sp
 import com.nikitaberezhnyj.saycheese.R
 import com.nikitaberezhnyj.saycheese.theme.Accent
 import com.nikitaberezhnyj.saycheese.theme.BackgroundDark
+import com.nikitaberezhnyj.saycheese.theme.FontSize
 import com.nikitaberezhnyj.saycheese.theme.Highlight
 import com.nikitaberezhnyj.saycheese.theme.Spacing
 import com.nikitaberezhnyj.saycheese.theme.TextPrimary
@@ -31,7 +32,7 @@ fun ZoomIndicator(
 
     Text(
         text = stringResource(R.string.zoom_format, zoomRatio),
-        fontSize = 14.sp,
+        fontSize = FontSize.Small,
         fontWeight = FontWeight.SemiBold,
         color = if (isZoomed) Highlight else TextPrimary,
         modifier = modifier

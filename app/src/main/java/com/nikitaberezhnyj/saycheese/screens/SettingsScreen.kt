@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -22,10 +22,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nikitaberezhnyj.saycheese.R
-import com.nikitaberezhnyj.saycheese.components.SettingsOptionGroup
+import com.nikitaberezhnyj.saycheese.components.SettingsSection
+import com.nikitaberezhnyj.saycheese.components.SettingsSegmentedRow
 import com.nikitaberezhnyj.saycheese.components.SettingsSwitchRow
 import com.nikitaberezhnyj.saycheese.models.PhotoFormat
 import com.nikitaberezhnyj.saycheese.theme.BackgroundDark
+import com.nikitaberezhnyj.saycheese.theme.FontSize
 import com.nikitaberezhnyj.saycheese.theme.IconSize
 import com.nikitaberezhnyj.saycheese.theme.Spacing
 import com.nikitaberezhnyj.saycheese.theme.TextPrimary
@@ -49,7 +51,7 @@ fun SettingsScreen(
             stringResource(R.string.settings_timer_seconds, seconds)
         }
     }
-
+    val formatOptions = PhotoFormat.entries.map { it to stringResource(it.labelRes) }
     val languageOptions = listOf(
         "uk" to stringResource(R.string.settings_language_ukrainian),
         "en" to stringResource(R.string.settings_language_english)
@@ -75,12 +77,10 @@ fun SettingsScreen(
                     modifier = Modifier.size(IconSize.Medium)
                 )
             }
-
             Spacer(Modifier.width(Spacing.S))
-
             Text(
                 text = stringResource(R.string.settings_title),
-                fontSize = 20.sp,
+                fontSize = FontSize.Subtitle,
                 fontWeight = FontWeight.SemiBold,
                 color = TextPrimary
             )
@@ -90,46 +90,53 @@ fun SettingsScreen(
             modifier = Modifier
                 .weight(1f)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = Spacing.M),
+                .padding(horizontal = Spacing.M)
+                .padding(bottom = Spacing.L),
             verticalArrangement = Arrangement.spacedBy(Spacing.L)
         ) {
-            SettingsSwitchRow(
-                label = stringResource(R.string.settings_show_grid),
-                checked = uiState.gridEnabled,
-                onCheckedChange = viewModel::setGridEnabled
-            )
+            SettingsSection(title = stringResource(R.string.settings_section_camera)) {
+                SettingsSwitchRow(
+                    icon = Icons.Outlined.GridOn,
+                    label = stringResource(R.string.settings_show_grid),
+                    checked = uiState.gridEnabled,
+                    onCheckedChange = viewModel::setGridEnabled
+                )
+                SettingsSwitchRow(
+                    icon = Icons.Outlined.Mic,
+                    label = stringResource(R.string.settings_listening),
+                    checked = uiState.speechRecognitionEnabled,
+                    onCheckedChange = viewModel::setSpeechRecognitionEnabled,
+                )
+                SettingsSegmentedRow(
+                    icon = Icons.Outlined.Timer,
+                    label = stringResource(R.string.settings_timer_label),
+                    options = timerOptions,
+                    selected = uiState.timerSeconds,
+                    onSelect = viewModel::setTimerSeconds
+                )
+                SettingsSegmentedRow(
+                    icon = Icons.Outlined.AspectRatio,
+                    label = stringResource(R.string.settings_photo_format),
+                    options = formatOptions,
+                    selected = uiState.photoFormat,
+                    onSelect = viewModel::setPhotoFormat
+                )
+            }
 
-            SettingsSwitchRow(
-                label = stringResource(R.string.settings_listening),
-                checked = uiState.speechRecognitionEnabled,
-                onCheckedChange = viewModel::setSpeechRecognitionEnabled
-            )
-
-            SettingsOptionGroup(
-                title = stringResource(R.string.settings_timer_label),
-                options = timerOptions,
-                selected = uiState.timerSeconds,
-                onSelect = viewModel::setTimerSeconds
-            )
-
-            SettingsOptionGroup(
-                title = stringResource(R.string.settings_language),
-                options = languageOptions,
-                selected = currentLanguage,
-                onSelect = { language ->
-                    if (language != currentLanguage) {
-                        LocaleUtils.saveLanguage(context, language)
-                        (context as Activity).recreate()
+            SettingsSection(title = stringResource(R.string.settings_section_app)) {
+                SettingsSegmentedRow(
+                    icon = Icons.Outlined.Language,
+                    label = stringResource(R.string.settings_language),
+                    options = languageOptions,
+                    selected = currentLanguage,
+                    onSelect = { language ->
+                        if (language != currentLanguage) {
+                            LocaleUtils.saveLanguage(context, language)
+                            (context as Activity).recreate()
+                        }
                     }
-                }
-            )
-
-            SettingsOptionGroup(
-                title = stringResource(R.string.settings_photo_format),
-                options = PhotoFormat.entries.map { it to stringResource(it.labelRes) },
-                selected = uiState.photoFormat,
-                onSelect = viewModel::setPhotoFormat
-            )
+                )
+            }
         }
     }
 }

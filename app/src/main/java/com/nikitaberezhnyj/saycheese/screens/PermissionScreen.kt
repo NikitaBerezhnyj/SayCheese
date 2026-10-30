@@ -28,6 +28,7 @@ import com.nikitaberezhnyj.saycheese.components.PrimaryButton
 import com.nikitaberezhnyj.saycheese.components.ScreenLayout
 import com.nikitaberezhnyj.saycheese.constants.Constants
 import com.nikitaberezhnyj.saycheese.theme.DangerText
+import com.nikitaberezhnyj.saycheese.theme.FontSize
 import com.nikitaberezhnyj.saycheese.theme.Spacing
 import com.nikitaberezhnyj.saycheese.utils.PermissionUtils
 
@@ -72,7 +73,7 @@ fun PermissionScreen(onResult: () -> Unit) {
         if (blocked) {
             Text(
                 text = stringResource(R.string.permission_blocked),
-                fontSize = 14.sp,
+                fontSize = FontSize.Small,
                 color = DangerText,
                 textAlign = TextAlign.Center
             )

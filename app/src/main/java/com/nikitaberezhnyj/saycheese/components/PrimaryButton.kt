@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.nikitaberezhnyj.saycheese.theme.FontSize
 
 @Composable
 fun PrimaryButton(text: String, onClick: () -> Unit) {
@@ -22,6 +23,6 @@ fun PrimaryButton(text: String, onClick: () -> Unit) {
             .height(52.dp),
         shape = CircleShape
     ) {
-        Text(text = text, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Text(text = text, fontSize = FontSize.Body, fontWeight = FontWeight.Bold)
     }
 }

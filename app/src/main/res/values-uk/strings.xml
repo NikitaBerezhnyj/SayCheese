@@ -58,6 +58,10 @@
 
     <string name="zoom_format" translatable="false">%1$.1f×</string>
 
+    <string name="settings_section_camera">Камера</string>
+    <string name="settings_section_app">Застосунок</string>
+    <string name="settings_listening_desc">Скажіть «cheese» для фото або «timer» для відліку.</string>
+
     <string name="settings_photo_format">Формат фото</string>
     <string name="format_3_4" translatable="false">3:4</string>
     <string name="format_1_1" translatable="false">1:1</string>

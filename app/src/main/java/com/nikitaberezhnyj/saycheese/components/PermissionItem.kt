@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nikitaberezhnyj.saycheese.theme.Accent
 import com.nikitaberezhnyj.saycheese.theme.BackgroundDark
+import com.nikitaberezhnyj.saycheese.theme.FontSize
 import com.nikitaberezhnyj.saycheese.theme.IconSize
 import com.nikitaberezhnyj.saycheese.theme.Radius
 import com.nikitaberezhnyj.saycheese.theme.Spacing
@@ -58,16 +59,16 @@ fun PermissionItem(
         Column {
             Text(
                 text = title,
-                fontSize = 16.sp,
+                fontSize = FontSize.Body,
                 fontWeight = FontWeight.SemiBold,
                 color = TextPrimary
             )
             Spacer(Modifier.height(Spacing.XS))
             Text(
                 text = description,
-                fontSize = 14.sp,
+                fontSize = FontSize.Small,
                 color = TextSecondary,
-                lineHeight = 20.sp
+                lineHeight = FontSize.Body
             )
         }
     }

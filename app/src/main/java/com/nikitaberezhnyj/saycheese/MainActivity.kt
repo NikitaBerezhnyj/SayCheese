@@ -21,8 +21,12 @@ import com.nikitaberezhnyj.saycheese.utils.LocaleUtils
 import com.nikitaberezhnyj.saycheese.utils.PermissionUtils
 import com.nikitaberezhnyj.saycheese.viewmodels.CameraViewModel
 import java.util.Locale
+import androidx.activity.viewModels
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 
 class MainActivity : ComponentActivity() {
+    private val viewModel: CameraViewModel by viewModels()
+
     override fun attachBaseContext(newBase: Context) {
         val prefs = newBase.getSharedPreferences("app_settings", Context.MODE_PRIVATE)
         val supportedLanguages = listOf("en", "uk")
@@ -42,47 +46,60 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
             navigationBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
         )
 
+        viewModel.initializeSpeechModel(PermissionUtils.allPermissionsGranted(this))
+
+        splashScreen.setKeepOnScreenCondition {
+            val state = viewModel.uiState.value
+            PermissionUtils.allPermissionsGranted(this) &&
+                    state.speechRecognitionEnabled &&
+                    !state.speechModelInitialized &&
+                    state.speechStatusKey != SpeechStatusKey.ERROR_INIT
+        }
+
         setContent {
-            SayCheeseTheme {
-                val viewModel: CameraViewModel = viewModel()
-                val uiState by viewModel.uiState.collectAsState()
 
-                var permissionsGranted by remember {
-                    mutableStateOf(PermissionUtils.allPermissionsGranted(this))
-                }
-                val refreshPermissions = {
-                    permissionsGranted = PermissionUtils.allPermissionsGranted(this)
-                }
+            setContent {
+                SayCheeseTheme {
+                    val uiState by viewModel.uiState.collectAsState()
 
-                LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { refreshPermissions() }
+                    var permissionsGranted by remember {
+                        mutableStateOf(PermissionUtils.allPermissionsGranted(this))
+                    }
+                    val refreshPermissions = {
+                        permissionsGranted = PermissionUtils.allPermissionsGranted(this)
+                    }
 
-                LaunchedEffect(permissionsGranted, uiState.speechRecognitionEnabled) {
-                    viewModel.initializeSpeechModel(permissionsGranted)
-                }
+                    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { refreshPermissions() }
 
-                val speechNotReady =
-                    uiState.speechRecognitionEnabled && !uiState.speechModelInitialized
+                    LaunchedEffect(permissionsGranted, uiState.speechRecognitionEnabled) {
+                        viewModel.initializeSpeechModel(permissionsGranted)
+                    }
 
-                when {
-                    !permissionsGranted -> PermissionScreen(onResult = refreshPermissions)
+                    val speechNotReady =
+                        uiState.speechRecognitionEnabled && !uiState.speechModelInitialized
 
-                    speechNotReady && uiState.speechStatusKey == SpeechStatusKey.ERROR_INIT ->
-                        ErrorScreen(
-                            onRetry = { viewModel.initializeSpeechModel(true) },
-                            onContinueWithoutVoice = { viewModel.setSpeechRecognitionEnabled(false) }
-                        )
+                    when {
+                        !permissionsGranted -> PermissionScreen(onResult = refreshPermissions)
 
-                    speechNotReady -> LoadingScreen()
+                        speechNotReady && uiState.speechStatusKey == SpeechStatusKey.ERROR_INIT ->
+                            ErrorScreen(
+                                onRetry = { viewModel.initializeSpeechModel(true) },
+                                onContinueWithoutVoice = { viewModel.setSpeechRecognitionEnabled(false) }
+                            )
 
-                    uiState.settingsVisible -> SettingsScreen()
+                        speechNotReady -> LoadingScreen()
 
-                    else -> CameraScreen()
+                        uiState.settingsVisible -> SettingsScreen()
+
+                        else -> CameraScreen()
+                    }
                 }
             }
         }
