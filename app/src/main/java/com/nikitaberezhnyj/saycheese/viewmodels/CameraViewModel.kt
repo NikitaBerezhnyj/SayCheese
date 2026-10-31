@@ -294,9 +294,16 @@ class CameraViewModel(
 
         onCommandHeard(command)
 
-        when (command) {
-            VoiceCommand.CHEESE -> takePicture()
-            VoiceCommand.TIMER -> startTimerPhoto()
+        viewModelScope.launch {
+            delay(350.milliseconds)
+
+            // Перевіряємо, чи стан усе ще актуальний
+            if (!_uiState.value.timerActive) {
+                when (command) {
+                    VoiceCommand.CHEESE -> takePicture()
+                    VoiceCommand.TIMER -> startTimerPhoto()
+                }
+            }
         }
     }
 
