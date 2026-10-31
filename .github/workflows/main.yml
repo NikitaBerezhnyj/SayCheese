@@ -143,5 +143,5 @@ jobs:
           echo "Creating release v$VERSION"
           gh release create "$VERSION" \
             --title "SayCheese v$VERSION" \
-            --notes "Automated release build"
+            --generate-notes
           gh release upload "$VERSION" ./artifacts/*.apk ./artifacts/*.aab --clobber
