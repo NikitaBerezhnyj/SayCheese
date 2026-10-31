@@ -29,6 +29,7 @@
     <string name="speech_hint_title">Скажи «cheese»</string>
     <string name="speech_hint_subtitle">або «timer» — фото з таймером</string>
     <string name="speech_unavailable">Голосові команди недоступні</string>
+    <string name="desc_voice_listening">Голосові команди активні</string>
 
     <!-- Reasons why speech is inactive -->
     <string name="reason_disabled">вимкнено</string>

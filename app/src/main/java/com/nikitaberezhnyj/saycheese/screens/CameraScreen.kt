@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -20,10 +21,13 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nikitaberezhnyj.saycheese.components.*
 import com.nikitaberezhnyj.saycheese.models.PhotoFormat
+import com.nikitaberezhnyj.saycheese.models.ScreenFlashMode
 import com.nikitaberezhnyj.saycheese.theme.BackgroundDark
 import com.nikitaberezhnyj.saycheese.theme.BarHeight
 import com.nikitaberezhnyj.saycheese.theme.Spacing
 import com.nikitaberezhnyj.saycheese.viewmodels.CameraViewModel
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.layout.boundsInRoot
 
 private const val FULL_SCREEN_BAR_ALPHA = 0.85f
 
@@ -105,7 +109,8 @@ fun CameraScreen(
                 CameraPreview(
                     controller = viewModel.cameraController,
                     cameraSelector = cameraSelector,
-                    flashEnabled = uiState.flashEnabled,
+                    flashEnabled = uiState.flashEnabled &&
+                            uiState.lensFacing == CameraSelector.LENS_FACING_BACK,
                     modifier = Modifier.fillMaxSize()
                 )
 
@@ -150,41 +155,35 @@ fun CameraScreen(
                     )
                 }
 
-                Column(
+                Box(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
+                        .padding(bottom = Spacing.S)
                         .fillMaxWidth()
-                        .padding(bottom = Spacing.S),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(Spacing.S)
+                        .height(44.dp)
+                        .padding(horizontal = Spacing.M)
                 ) {
+                    if (uiState.timerSeconds > 0) {
+                        TimerButton(
+                            iconRotation = { iconRotation.value },
+                            onClick = viewModel::startTimerPhoto,
+                            modifier = Modifier.align(Alignment.CenterStart)
+                        )
+                    }
+
                     if (uiState.speechRecognitionEnabled) {
-                        SpeechHint(
+                        VoiceIndicator(
                             statusKey = uiState.speechStatusKey,
-                            heardCommand = uiState.heardCommand
+                            heardCommand = uiState.heardCommand,
+                            modifier = Modifier.align(Alignment.Center)
                         )
                     }
 
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(44.dp)
-                            .padding(horizontal = Spacing.M)
-                    ) {
-                        if (uiState.timerSeconds > 0) {
-                            TimerButton(
-                                iconRotation = { iconRotation.value },
-                                onClick = viewModel::startTimerPhoto,
-                                modifier = Modifier.align(Alignment.CenterStart)
-                            )
-                        }
-
-                        ZoomIndicator(
-                            zoomRatio = uiState.zoomRatio,
-                            onReset = { viewModel.setZoom(1f) },
-                            modifier = Modifier.align(Alignment.CenterEnd)
-                        )
-                    }
+                    ZoomIndicator(
+                        zoomRatio = uiState.zoomRatio,
+                        onReset = { viewModel.setZoom(1f) },
+                        modifier = Modifier.align(Alignment.CenterEnd)
+                    )
                 }
             }
 
@@ -203,6 +202,10 @@ fun CameraScreen(
 
         if (uiState.flashVisible) {
             FlashOverlay { viewModel.hideFlash() }
+        }
+
+        if (uiState.screenFlash != ScreenFlashMode.OFF) {
+            ScreenFlash(mode = uiState.screenFlash)
         }
     }
 }

@@ -24,6 +24,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 import android.media.MediaActionSound
+import com.nikitaberezhnyj.saycheese.models.ScreenFlashMode
+import com.nikitaberezhnyj.saycheese.utils.findLastPhotoUri
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class CameraViewModel(
     application: Application
@@ -44,6 +48,13 @@ class CameraViewModel(
             speechRecognitionEnabled = initialSettings.speechRecognitionEnabled
         )
     )
+
+    init {
+        viewModelScope.launch {
+            val uri = withContext(Dispatchers.IO) { findLastPhotoUri(application) }
+            _uiState.update { it.copy(lastPhotoUri = it.lastPhotoUri ?: uri) }
+        }
+    }
 
     val uiState = _uiState.asStateFlow()
 
@@ -79,6 +90,7 @@ class CameraViewModel(
     private var isInitializingSpeech = false
 
     private var heardJob: Job? = null
+    private var screenFlashJob: Job? = null
 
     fun setImageCapture(capture: ImageCapture?) {
         imageCapture = capture
@@ -140,12 +152,37 @@ class CameraViewModel(
 
     fun takePicture() {
         val capture = cameraController.imageCapture ?: return
+        val state = _uiState.value
+        if (state.screenFlash != ScreenFlashMode.OFF) return
 
+        if (state.flashEnabled && state.lensFacing == CameraSelector.LENS_FACING_FRONT) {
+            screenFlashJob = viewModelScope.launch {
+                setScreenFlash(ScreenFlashMode.GLOW)
+                delay(SCREEN_FLASH_GLOW_MS.milliseconds)
+                setScreenFlash(ScreenFlashMode.FLASH)
+                delay(SCREEN_FLASH_FULL_MS.milliseconds)
+                shoot(capture)
+            }
+        } else {
+            shoot(capture)
+        }
+    }
+
+    private fun setScreenFlash(mode: ScreenFlashMode) {
+        _uiState.update { it.copy(screenFlash = mode) }
+    }
+
+    private fun shoot(capture: ImageCapture) {
         shutterSound.play(MediaActionSound.SHUTTER_CLICK)
         _uiState.update { it.copy(flashVisible = true) }
 
         takePhoto(getApplication(), capture) { uri ->
-            _uiState.update { it.copy(lastPhotoUri = uri) }
+            _uiState.update {
+                it.copy(
+                    lastPhotoUri = uri ?: it.lastPhotoUri,
+                    screenFlash = ScreenFlashMode.OFF
+                )
+            }
         }
     }
 
@@ -239,8 +276,12 @@ class CameraViewModel(
         orientationListener.disable()
         speechController.stopListening()
 
+        screenFlashJob?.cancel()
         _uiState.update {
-            it.copy(speechStatusKey = SpeechStatusKey.PAUSED)
+            it.copy(
+                speechStatusKey = SpeechStatusKey.PAUSED,
+                screenFlash = ScreenFlashMode.OFF
+            )
         }
     }
 
@@ -298,5 +339,7 @@ class CameraViewModel(
 
     companion object {
         private const val TAG = "CameraViewModel"
+        private const val SCREEN_FLASH_GLOW_MS = 1000L
+        private const val SCREEN_FLASH_FULL_MS = 200L
     }
 }

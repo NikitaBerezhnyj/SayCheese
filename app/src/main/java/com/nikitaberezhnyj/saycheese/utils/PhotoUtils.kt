@@ -1,5 +1,6 @@
 package com.nikitaberezhnyj.saycheese.utils
 
+import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
 import android.net.Uri
@@ -44,6 +45,7 @@ fun takePhoto(
 
                 Log.e("CameraX", "Photo save failed: $errorMessage (code ${exc.imageCaptureError})", exc)
 
+                onPhotoSaved(null)
                 Toast.makeText(
                     context,
                     context.getString(R.string.photo_error_save, errorMessage),
@@ -57,4 +59,22 @@ fun takePhoto(
             }
         }
     )
+}
+
+fun findLastPhotoUri(context: Context): Uri? {
+    val collection = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+
+    context.contentResolver.query(
+        collection,
+        arrayOf(MediaStore.Images.Media._ID),
+        "${MediaStore.MediaColumns.RELATIVE_PATH} LIKE ?",
+        arrayOf("DCIM/SayCheese%"),
+        "${MediaStore.MediaColumns.DATE_ADDED} DESC"
+    )?.use { cursor ->
+        if (cursor.moveToFirst()) {
+            val id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID))
+            return ContentUris.withAppendedId(collection, id)
+        }
+    }
+    return null
 }

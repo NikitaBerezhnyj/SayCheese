@@ -29,6 +29,7 @@
     <string name="speech_hint_title">Say “cheese”</string>
     <string name="speech_hint_subtitle">or “timer” for a countdown</string>
     <string name="speech_unavailable">Voice commands unavailable</string>
+    <string name="desc_voice_listening">Voice commands active</string>
 
     <!-- Reasons why speech is inactive -->
     <string name="reason_disabled">disabled</string>

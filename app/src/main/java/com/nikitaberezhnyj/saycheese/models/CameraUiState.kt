@@ -15,6 +15,8 @@ data class CameraUiState(
 
     val settingsVisible: Boolean = false,
     val flashVisible: Boolean = false,
+    val screenFlashActive: Boolean = false,
+    val screenFlash: ScreenFlashMode = ScreenFlashMode.OFF,
     val timerActive: Boolean = false,
     val lastPhotoUri: Uri? = null,
     val heardCommand: VoiceCommand? = null,
