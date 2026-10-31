@@ -1,9 +1,6 @@
 <resources>
     <string name="app_name">SayCheese</string>
 
-    <!-- Splash Screen -->
-    <string name="splash_subtitle">Скажи «Сир» і посміхнись!</string>
-
     <!-- Permission Screen -->
     <string name="permission_title">Потрібен доступ до камери</string>
     <string name="permission_description">Щоб робити чудові фото та користуватись голосовими командами, нам потрібен доступ до вашої камери та мікрофона.</string>
@@ -11,7 +8,6 @@
     <string name="permission_camera_desc">Робити фото та записувати відео</string>
     <string name="permission_mic_title">Мікрофон</string>
     <string name="permission_mic_desc">Голосові команди, наприклад «Сир!»</string>
-    <string name="permission_note">Ми дбаємо про вашу приватність. Ці дозволи використовуються лише для функцій камери.</string>
 
     <!-- Permissions -->
     <string name="grant_permissions">Надати дозволи</string>
@@ -26,16 +22,8 @@
     <string name="permission_open_settings">Відкрити налаштування</string>
 
     <!-- Speech recognition statuses -->
-    <string name="speech_hint_title">Скажи «cheese»</string>
-    <string name="speech_hint_subtitle">або «timer» — фото з таймером</string>
     <string name="speech_unavailable">Голосові команди недоступні</string>
     <string name="desc_voice_listening">Голосові команди активні</string>
-
-    <!-- Reasons why speech is inactive -->
-    <string name="reason_disabled">вимкнено</string>
-    <string name="reason_loading">йде підготовка</string>
-    <string name="reason_not_ready">ще не готово</string>
-    <string name="reason_unknown">невідомо</string>
 
     <!-- Photo capture -->
     <string name="photo_error_invalid_camera">Проблема з камерою</string>
@@ -44,8 +32,6 @@
     <string name="photo_error_camera_closed">Камеру закрито</string>
     <string name="photo_error_unknown">Щось пішло не так</string>
     <string name="photo_error_generic">Помилка зйомки</string>
-    <string name="photo_saved">Фото збережено</string>
-    <string name="photo_save_error">Не вдалося зберегти: %1$s</string>
 
     <!-- ... -->
     <string name="photo_error_save">Не вдалося зберегти фото: %1$s</string>
@@ -61,15 +47,11 @@
 
     <string name="settings_section_camera">Камера</string>
     <string name="settings_section_app">Застосунок</string>
-    <string name="settings_listening_desc">Скажіть «cheese» для фото або «timer» для відліку.</string>
 
     <string name="settings_photo_format">Формат фото</string>
     <string name="format_3_4" translatable="false">3:4</string>
     <string name="format_1_1" translatable="false">1:1</string>
     <string name="format_full">На весь екран</string>
-
-    <!-- Camera state -->
-    <string name="camera_not_ready">Камера не готова. Спробуйте ще раз.</string>
 
     <!-- Settings dialog -->
     <string name="settings_title">Налаштування</string>

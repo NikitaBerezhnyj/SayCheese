@@ -84,17 +84,11 @@ class CameraViewModel(
         }
     }
 
-    private var imageCapture: ImageCapture? = null
-
     private var isResumed = false
     private var isInitializingSpeech = false
 
     private var heardJob: Job? = null
     private var screenFlashJob: Job? = null
-
-    fun setImageCapture(capture: ImageCapture?) {
-        imageCapture = capture
-    }
 
     fun toggleFlash() {
         val enabled = !_uiState.value.flashEnabled
@@ -333,7 +327,6 @@ class CameraViewModel(
     override fun onCleared() {
         speechController.release()
         shutterSound.release()
-        imageCapture = null
         super.onCleared()
     }
 

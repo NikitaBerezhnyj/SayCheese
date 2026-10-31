@@ -1,9 +1,6 @@
 <resources>
     <string name="app_name">SayCheese</string>
 
-    <!-- Splash Screen -->
-    <string name="splash_subtitle">Say Cheese and Smile!</string>
-
     <!-- Permission Screen -->
     <string name="permission_title">Camera Access Required</string>
     <string name="permission_description">To capture amazing photos and use voice commands, we need access to your camera and microphone.</string>
@@ -11,7 +8,6 @@
     <string name="permission_camera_desc">Take photos and record videos</string>
     <string name="permission_mic_title">Microphone</string>
     <string name="permission_mic_desc">Voice commands like "Cheese!"</string>
-    <string name="permission_note">Your privacy is important. We only use these permissions for camera features.</string>
 
     <!-- Permissions -->
     <string name="grant_permissions">Grant Permissions</string>
@@ -26,16 +22,8 @@
     <string name="permission_open_settings">Open settings</string>
 
     <!-- Speech recognition statuses -->
-    <string name="speech_hint_title">Say “cheese”</string>
-    <string name="speech_hint_subtitle">or “timer” for a countdown</string>
     <string name="speech_unavailable">Voice commands unavailable</string>
     <string name="desc_voice_listening">Voice commands active</string>
-
-    <!-- Reasons why speech is inactive -->
-    <string name="reason_disabled">disabled</string>
-    <string name="reason_loading">initializing</string>
-    <string name="reason_not_ready">not ready yet</string>
-    <string name="reason_unknown">unknown</string>
 
     <!-- Photo capture -->
     <string name="photo_error_invalid_camera">Camera error</string>
@@ -44,8 +32,6 @@
     <string name="photo_error_camera_closed">Camera closed</string>
     <string name="photo_error_unknown">Something went wrong</string>
     <string name="photo_error_generic">Capture error</string>
-    <string name="photo_saved">Photo saved</string>
-    <string name="photo_save_error">Failed to save: %1$s</string>
 
     <!-- ... -->
     <string name="photo_error_save">Failed to save photo: %1$s</string>
@@ -61,15 +47,11 @@
 
     <string name="settings_section_camera">Camera</string>
     <string name="settings_section_app">App</string>
-    <string name="settings_listening_desc">Say “cheese” for a photo or “timer” for a countdown.</string>
 
     <string name="settings_photo_format">Photo format</string>
     <string name="format_3_4" translatable="false">3:4</string>
     <string name="format_1_1" translatable="false">1:1</string>
     <string name="format_full">Full screen</string>
-
-    <!-- Camera state -->
-    <string name="camera_not_ready">Camera not ready. Please try again.</string>
 
     <!-- Settings dialog -->
     <string name="settings_title">Settings</string>
