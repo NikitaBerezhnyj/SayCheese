@@ -45,7 +45,8 @@ class CameraViewModel(
             gridEnabled = initialSettings.gridEnabled,
             timerSeconds = initialSettings.timerSeconds,
             photoFormat = initialSettings.photoFormat,
-            speechRecognitionEnabled = initialSettings.speechRecognitionEnabled
+            speechRecognitionEnabled = initialSettings.speechRecognitionEnabled,
+            howItWorksVisible = !settingsRepository.hasShownHowItWorks()
         )
     )
 
@@ -86,9 +87,19 @@ class CameraViewModel(
 
     private var isResumed = false
     private var isInitializingSpeech = false
+    var showHowItWorksOnStart = !settingsRepository.hasShownHowItWorks()
+        private set
 
     private var heardJob: Job? = null
     private var screenFlashJob: Job? = null
+
+    fun setHowItWorksVisible(visible: Boolean) {
+        if (!visible) {
+            settingsRepository.setShownHowItWorks(true)
+            showHowItWorksOnStart = false
+        }
+        _uiState.update { it.copy(howItWorksVisible = visible) }
+    }
 
     fun toggleFlash() {
         val enabled = !_uiState.value.flashEnabled

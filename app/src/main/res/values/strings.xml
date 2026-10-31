@@ -12,6 +12,18 @@
     <!-- Permissions -->
     <string name="grant_permissions">Grant Permissions</string>
 
+    <!-- How It Works Screen -->
+    <string name="how_it_works_title">How It Works</string>
+    <string name="how_it_works_subtitle">Learn how to capture photos hands-free using voice commands.</string>
+    <string name="how_it_works_cheese_title">Say \"Cheese!\"</string>
+    <string name="how_it_works_cheese_desc">Speak clearly to snap a photo instantly without touching your phone.</string>
+    <string name="how_it_works_timer_title">Say \"Timer\"</string>
+    <string name="how_it_works_timer_desc">Trigger the countdown timer hands-free to get ready for your shot.</string>
+    <string name="how_it_works_continue">Got it</string>
+    <string name="settings_section_about">About</string>
+    <string name="settings_how_it_works">How it works</string>
+    <string name="settings_how_it_works_desc">Tips on voice commands</string>
+
     <!-- Voice Recognition -->
     <string name="loading_voice">Preparing voice recognition…</string>
     <string name="error_voice_title">Voice recognition failed to start</string>

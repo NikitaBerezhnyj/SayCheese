@@ -19,6 +19,7 @@ object Constants {
     const val KEY_TIMER_SECONDS = "timer_seconds"
     const val KEY_SPEECH_RECOGNITION = "speech_recognition"
     const val KEY_PHOTO_FORMAT = "photo_format"
+    const val KEY_SHOWN_HOW_IT_WORKS = "shown_how_it_works"
 
     const val DEFAULT_LENS_FACING = CameraSelector.LENS_FACING_BACK
     const val DEFAULT_FLASH_ENABLED = false

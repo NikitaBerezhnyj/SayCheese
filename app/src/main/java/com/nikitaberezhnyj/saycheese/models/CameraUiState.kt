@@ -10,8 +10,7 @@ data class CameraUiState(
     val gridEnabled: Boolean = Constants.DEFAULT_GRID_ENABLED,
     val timerSeconds: Int = Constants.DEFAULT_TIMER_SECONDS,
     val photoFormat: PhotoFormat = Constants.DEFAULT_PHOTO_FORMAT,
-    val speechRecognitionEnabled: Boolean =
-        Constants.DEFAULT_SPEECH_RECOGNITION,
+    val speechRecognitionEnabled: Boolean = Constants.DEFAULT_SPEECH_RECOGNITION,
 
     val settingsVisible: Boolean = false,
     val flashVisible: Boolean = false,
@@ -24,5 +23,7 @@ data class CameraUiState(
     val deviceRotation: Int = Surface.ROTATION_0,
 
     val speechModelInitialized: Boolean = false,
-    val speechStatusKey: SpeechStatusKey = SpeechStatusKey.LOADING
+    val speechStatusKey: SpeechStatusKey = SpeechStatusKey.LOADING,
+
+    val howItWorksVisible: Boolean = false
 )

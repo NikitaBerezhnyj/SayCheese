@@ -5,10 +5,12 @@ package com.nikitaberezhnyj.saycheese.screens
 import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -19,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nikitaberezhnyj.saycheese.R
@@ -31,6 +34,7 @@ import com.nikitaberezhnyj.saycheese.theme.FontSize
 import com.nikitaberezhnyj.saycheese.theme.IconSize
 import com.nikitaberezhnyj.saycheese.theme.Spacing
 import com.nikitaberezhnyj.saycheese.theme.TextPrimary
+import com.nikitaberezhnyj.saycheese.theme.TextSecondary
 import com.nikitaberezhnyj.saycheese.utils.LocaleUtils
 import com.nikitaberezhnyj.saycheese.viewmodels.CameraViewModel
 
@@ -71,7 +75,7 @@ fun SettingsScreen(
         ) {
             IconButton(onClick = { viewModel.setSettingsVisible(false) }) {
                 Icon(
-                    imageVector = Icons.Outlined.ArrowBack,
+                    imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                     contentDescription = stringResource(R.string.desc_back),
                     tint = TextPrimary,
                     modifier = Modifier.size(IconSize.Medium)
@@ -136,6 +140,43 @@ fun SettingsScreen(
                         }
                     }
                 )
+            }
+
+            SettingsSection(title = stringResource(R.string.settings_section_about)) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 48.dp)
+                        .clickable { viewModel.setHowItWorksVisible(true) },
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Info,
+                        contentDescription = null,
+                        tint = TextSecondary,
+                        modifier = Modifier.size(IconSize.Small)
+                    )
+                    Spacer(Modifier.width(Spacing.M))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.settings_how_it_works),
+                            fontSize = FontSize.Body,
+                            color = TextPrimary
+                        )
+                        Text(
+                            text = stringResource(R.string.settings_how_it_works_desc),
+                            fontSize = FontSize.Small,
+                            color = TextSecondary
+                        )
+                    }
+                    Spacer(Modifier.width(Spacing.M))
+                    Icon(
+                        imageVector = Icons.Outlined.ChevronRight,
+                        contentDescription = null,
+                        tint = TextSecondary,
+                        modifier = Modifier.size(IconSize.Small)
+                    )
+                }
             }
         }
     }

@@ -37,6 +37,16 @@ class CameraSettingsRepository(context: Context) {
         )
     }
 
+    fun hasShownHowItWorks(): Boolean {
+        return prefs.getBoolean(Constants.KEY_SHOWN_HOW_IT_WORKS, false)
+    }
+
+    fun setShownHowItWorks(shown: Boolean) {
+        prefs.edit()
+            .putBoolean(Constants.KEY_SHOWN_HOW_IT_WORKS, shown)
+            .apply()
+    }
+
     fun saveLensFacing(value: Int) {
         prefs.edit()
             .putInt(Constants.KEY_LENS_FACING, value)

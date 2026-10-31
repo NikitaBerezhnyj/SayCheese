@@ -23,6 +23,7 @@ import com.nikitaberezhnyj.saycheese.viewmodels.CameraViewModel
 import java.util.Locale
 import androidx.activity.viewModels
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.nikitaberezhnyj.saycheese.screens.HowItWorksScreen
 
 class MainActivity : ComponentActivity() {
     private val viewModel: CameraViewModel by viewModels()
@@ -87,6 +88,9 @@ class MainActivity : ComponentActivity() {
 
                     when {
                         !permissionsGranted -> PermissionScreen(onResult = refreshPermissions)
+
+                        uiState.howItWorksVisible ->
+                            HowItWorksScreen(onContinue = { viewModel.setHowItWorksVisible(false) })
 
                         speechNotReady && uiState.speechStatusKey == SpeechStatusKey.ERROR_INIT ->
                             ErrorScreen(

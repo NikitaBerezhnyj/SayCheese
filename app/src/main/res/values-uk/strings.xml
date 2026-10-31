@@ -12,6 +12,18 @@
     <!-- Permissions -->
     <string name="grant_permissions">Надати дозволи</string>
 
+    <!-- How It Works Screen -->
+    <string name="how_it_works_title">Як це працює</string>
+    <string name="how_it_works_subtitle">Дізнайтеся, як робити фото без рук за допомогою голосових команд.</string>
+    <string name="how_it_works_cheese_title">Скажіть «Cheese!»</string>
+    <string name="how_it_works_cheese_desc">Вимовте чітко команду, щоб миттєво зробити фото без дотиків до телефону.</string>
+    <string name="how_it_works_timer_title">Скажіть «Timer»</string>
+    <string name="how_it_works_timer_desc">Запустіть таймер зворотного відліку голосом, щоб встигнути підготуватися.</string>
+    <string name="how_it_works_continue">Зрозуміло</string>
+    <string name="settings_section_about">Про застосунок</string>
+    <string name="settings_how_it_works">Як це працює</string>
+    <string name="settings_how_it_works_desc">Підказки щодо голосових команд</string>
+
     <!-- Voice Recognition -->
     <string name="loading_voice">Готуємо розпізнавання голосу…</string>
     <string name="error_voice_title">Не вдалося запустити розпізнавання голосу</string>
